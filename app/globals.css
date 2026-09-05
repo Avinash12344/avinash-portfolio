@@ -1,49 +1,272 @@
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* =========================================
+     COLORS
+  ========================================= */
+
+  --bg-primary: #080808;
+  --bg-secondary: #0d0d0d;
+  --bg-card: #101010;
+
+  --text-primary: #f5f5f5;
+  --text-secondary: #999999;
+  --text-muted: #666666;
+
+  --accent: #64ffda;
+
+  --border: rgba(255, 255, 255, 0.1);
+  --border-strong: rgba(255, 255, 255, 0.2);
+
+  /* =========================================
+     STATUS COLORS
+  ========================================= */
+
+  --color-success: #64ffda;
+  --color-danger: #ff7b7b;
+  --color-warning: #f5c76b;
+  --color-info: #8ab4ff;
+
+  /* =========================================
+     TYPOGRAPHY
+  ========================================= */
+
+  --font-sans:
+    Inter,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Arial,
+    Helvetica,
+    sans-serif;
+
+  --font-mono:
+    "SFMono-Regular",
+    Consolas,
+    "Liberation Mono",
+    monospace;
+
+  /* =========================================
+     LAYOUT
+  ========================================= */
+
+  --max-width: 1100px;
+  --navbar-height: 76px;
+
+  /* =========================================
+     RADIUS
+  ========================================= */
+
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 10px;
+
+  /* =========================================
+     TRANSITIONS
+  ========================================= */
+
+  --transition-fast: 180ms ease;
+  --transition-normal: 250ms ease;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
-html {
-  height: 100%;
-}
-
-html,
-body {
-  max-width: 100vw;
-  overflow-x: hidden;
-}
-
-body {
-  min-height: 100%;
-  display: flex;
-  flex-direction: column;
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
+/* ============================================
+   RESET
+============================================ */
 
 * {
   box-sizing: border-box;
-  padding: 0;
   margin: 0;
+  padding: 0;
 }
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: var(--navbar-height);
+}
+
+body {
+  min-height: 100vh;
+
+  background: var(--bg-primary);
+  color: var(--text-primary);
+
+  font-family: var(--font-sans);
+  line-height: 1.6;
+
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  overflow-x: hidden;
+}
+
+/* ============================================
+   ELEMENTS
+============================================ */
 
 a {
   color: inherit;
   text-decoration: none;
 }
 
-@media (prefers-color-scheme: dark) {
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button {
+  border: 0;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--bg-primary);
+}
+
+/* ============================================
+   CONTAINER
+============================================ */
+
+.container {
+  width: min(
+    calc(100% - 48px),
+    var(--max-width)
+  );
+
+  margin-inline: auto;
+}
+
+/* ============================================
+   SECTIONS
+============================================ */
+
+section {
+  padding: 120px 0;
+}
+
+/* ============================================
+   EYEBROW
+============================================ */
+
+.eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  margin-bottom: 24px;
+
+  color: var(--text-secondary);
+
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 600;
+
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+.eyebrow::before {
+  content: "";
+
+  width: 28px;
+  height: 1px;
+
+  background: var(--text-secondary);
+
+  flex-shrink: 0;
+}
+
+/* ============================================
+   SECTION TITLE
+============================================ */
+
+.section-title {
+  margin-bottom: 40px;
+
+  color: var(--text-primary);
+
+  font-size: clamp(
+    30px,
+    5vw,
+    46px
+  );
+
+  line-height: 1.1;
+  letter-spacing: -1.5px;
+}
+
+.section-title span {
+  color: var(--text-secondary);
+}
+
+/* ============================================
+   FOCUS ACCESSIBILITY
+============================================ */
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+}
+
+/* ============================================
+   MOBILE
+============================================ */
+
+@media (max-width: 768px) {
+  :root {
+    --navbar-height: 68px;
+  }
+
+  .container {
+    width: min(
+      calc(100% - 32px),
+      var(--max-width)
+    );
+  }
+
+  section {
+    padding: 80px 0;
+  }
+
+  .section-title {
+    margin-bottom: 28px;
+
+    font-size: clamp(
+      30px,
+      9vw,
+      42px
+    );
+  }
+}
+
+/* ============================================
+   REDUCED MOTION
+============================================ */
+
+@media (prefers-reduced-motion: reduce) {
   html {
-    color-scheme: dark;
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }

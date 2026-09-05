@@ -1,0 +1,415 @@
+/* =========================================
+   CLIENT DETAILS PAGE
+========================================= */
+
+.client-details-page {
+  padding: 32px;
+  min-height: 100%;
+  color: var(--text-primary);
+}
+
+
+/* =========================================
+   BACK
+========================================= */
+
+.client-back {
+  margin-bottom: 28px;
+  padding: 0;
+
+  border: none;
+  background: transparent;
+
+  color: var(--accent);
+
+  cursor: pointer;
+
+  font-family: var(--font-mono);
+  font-size: 12px;
+
+  transition: color 180ms ease;
+}
+
+.client-back:hover {
+  color: var(--text-primary);
+}
+
+
+/* =========================================
+   HEADER
+========================================= */
+
+.client-details-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+.client-details-eyebrow,
+.client-section-eyebrow {
+  margin-bottom: 8px;
+
+  color: var(--accent);
+
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.client-details-header h1 {
+  margin: 0 0 6px;
+
+  color: var(--text-primary);
+
+  font-family: var(--font-sans);
+  font-size: 32px;
+  font-weight: 600;
+
+  line-height: 1.2;
+  letter-spacing: -0.5px;
+}
+
+.client-details-header p {
+  margin: 0;
+
+  color: var(--text-secondary);
+
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+
+
+/* =========================================
+   ACTIONS
+========================================= */
+
+.client-details-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.client-action-button {
+  padding: 10px 16px;
+
+  border: 1px solid var(--border);
+  border-radius: 5px;
+
+  background: var(--bg-card);
+  color: var(--text-primary);
+
+  cursor: pointer;
+
+  font-family: var(--font-mono);
+  font-size: 11px;
+
+  transition:
+    background-color 180ms ease,
+    border-color 180ms ease,
+    color 180ms ease;
+}
+
+.client-action-button:hover {
+  background: var(--bg-secondary);
+  border-color: var(--border-strong);
+  color: var(--accent);
+}
+
+.client-action-button--danger:hover {
+  border-color: rgba(255, 100, 100, 0.3);
+  color: #ff7b7b;
+}
+
+
+/* =========================================
+   CLIENT INFO
+========================================= */
+
+.client-info-card {
+  margin-bottom: 48px;
+  padding: 24px;
+
+  border: 1px solid var(--border);
+  border-radius: 5px;
+
+  background: var(--bg-card);
+}
+
+.client-info-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+
+  gap: 28px;
+}
+
+.client-info-grid span,
+.client-notes span {
+  display: block;
+
+  margin-bottom: 6px;
+
+  color: var(--text-secondary);
+
+  font-family: var(--font-mono);
+  font-size: 10px;
+
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.client-info-grid strong {
+  color: var(--text-primary);
+
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 600;
+
+  word-break: break-word;
+}
+
+
+/* =========================================
+   NOTES
+========================================= */
+
+.client-notes {
+  margin-top: 28px;
+  padding-top: 24px;
+
+  border-top: 1px solid var(--border);
+}
+
+.client-notes p {
+  color: var(--text-primary);
+
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+
+/* =========================================
+   SECTIONS
+========================================= */
+
+.client-section {
+  margin-bottom: 48px;
+}
+
+.client-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  margin-bottom: 18px;
+}
+
+.client-section-header h2 {
+  color: var(--text-primary);
+
+  font-family: var(--font-sans);
+  font-size: 20px;
+  font-weight: 600;
+
+  letter-spacing: -0.3px;
+}
+
+.client-section-count {
+  min-width: 30px;
+  height: 30px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid var(--border);
+  border-radius: 50%;
+
+  background: var(--bg-secondary);
+  color: var(--accent);
+
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+
+/* =========================================
+   RELATED ITEMS
+========================================= */
+
+.client-related-list {
+  display: grid;
+  gap: 12px;
+}
+
+.client-related-card {
+  display: flex;
+  justify-content: space-between;
+
+  gap: 24px;
+  padding: 20px;
+
+  border: 1px solid var(--border);
+  border-radius: 5px;
+
+  background: var(--bg-card);
+
+  transition:
+    background-color 180ms ease,
+    border-color 180ms ease;
+}
+
+.client-related-card:hover {
+  background: var(--bg-secondary);
+  border-color: var(--border-strong);
+}
+
+.client-related-card h3 {
+  margin-bottom: 6px;
+
+  color: var(--text-primary);
+
+  font-family: var(--font-sans);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.client-related-card p {
+  max-width: 650px;
+
+  color: var(--text-secondary);
+
+  font-family: var(--font-sans);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.client-related-meta {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+
+  flex-wrap: wrap;
+  gap: 10px;
+
+  color: var(--text-secondary);
+
+  font-family: var(--font-mono);
+  font-size: 10px;
+}
+
+
+/* =========================================
+   STATUS
+========================================= */
+
+.status {
+  padding: 5px 9px;
+
+  border: 1px solid var(--border);
+  border-radius: 4px;
+
+  background: var(--bg-secondary);
+  color: var(--accent);
+
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+
+  text-transform: uppercase;
+}
+
+
+/* =========================================
+   EMPTY / STATE
+========================================= */
+
+.client-empty,
+.client-details-state {
+  padding: 40px;
+
+  border: 1px solid var(--border);
+  border-radius: 5px;
+
+  background: var(--bg-card);
+
+  color: var(--text-secondary);
+
+  font-family: var(--font-mono);
+  font-size: 12px;
+
+  text-align: center;
+}
+
+.client-details-state--error {
+  color: #ff7b7b;
+}
+
+
+/* =========================================
+   TABLET
+========================================= */
+
+@media (max-width: 900px) {
+  .client-details-page {
+    padding: 24px;
+  }
+
+  .client-details-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .client-info-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .client-related-card {
+    flex-direction: column;
+  }
+
+  .client-related-meta {
+    justify-content: flex-start;
+  }
+}
+
+
+/* =========================================
+   MOBILE
+========================================= */
+
+@media (max-width: 600px) {
+  .client-details-page {
+    padding: 20px;
+  }
+
+  .client-details-header h1 {
+    font-size: 28px;
+  }
+
+  .client-info-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .client-details-actions {
+    width: 100%;
+  }
+
+  .client-action-button {
+    flex: 1;
+  }
+
+  .client-info-card {
+    padding: 20px;
+  }
+
+  .client-related-card {
+    padding: 16px;
+  }
+}

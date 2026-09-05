@@ -1,0 +1,243 @@
+.contact {
+  position: relative;
+}
+
+.contact__grid {
+  display: grid;
+  grid-template-columns: minmax(280px, 0.8fr) minmax(400px, 1.2fr);
+
+  gap: 90px;
+  align-items: start;
+}
+
+.contact__content > p {
+  max-width: 500px;
+  margin-bottom: 36px;
+
+  color: var(--text-secondary);
+
+  font-size: 17px;
+  line-height: 1.8;
+}
+
+.contact__details {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.contact__details a {
+  color: var(--text-secondary);
+
+  font-family: var(--font-mono);
+  font-size: 12px;
+
+  transition: color 200ms ease;
+}
+
+.contact__details a:hover {
+  color: var(--accent);
+}
+
+.contact__form {
+  padding: 32px;
+
+  background: rgba(17, 34, 64, 0.35);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+}
+
+.form__group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  margin-bottom: 22px;
+}
+
+.form__row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.form__group label {
+  color: var(--text-primary);
+
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+
+.form__group input,
+.form__group select,
+.form__group textarea {
+  width: 100%;
+
+  padding: 13px 14px;
+
+  color: var(--text-primary);
+
+  background: var(--bg-primary);
+
+  border: 1px solid var(--border);
+  border-radius: 3px;
+
+  outline: none;
+
+  font-family: inherit;
+  font-size: 14px;
+
+  transition: border-color 200ms ease;
+}
+
+.form__group textarea {
+  resize: vertical;
+  min-height: 140px;
+}
+
+.form__group input::placeholder,
+.form__group textarea::placeholder {
+  color: var(--text-secondary);
+  opacity: 0.6;
+}
+
+.form__group input:focus,
+.form__group select:focus,
+.form__group textarea:focus {
+  border-color: var(--accent);
+}
+
+.form__group select {
+  cursor: pointer;
+}
+
+.contact__submit {
+  width: 100%;
+
+  padding: 15px 20px;
+
+  color: var(--bg-primary);
+  background: var(--accent);
+
+  border: 1px solid var(--accent);
+  border-radius: 3px;
+
+  cursor: pointer;
+
+  font-family: var(--font-mono);
+  font-size: 12px;
+
+  transition:
+    background-color 200ms ease,
+    color 200ms ease;
+}
+
+.contact__submit span {
+  margin-left: 8px;
+
+  font-size: 16px;
+}
+
+.contact__submit:hover {
+  color: var(--accent);
+  background: transparent;
+}
+
+@media (max-width: 850px) {
+  .contact__grid {
+    grid-template-columns: 1fr;
+    gap: 50px;
+  }
+}
+
+@media (max-width: 500px) {
+  .contact__form {
+    padding: 22px;
+  }
+
+  .form__row {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+}
+
+/* ============================================
+   FORM STATE
+============================================ */
+
+.contact__submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.contact__message {
+  margin: -4px 0 20px;
+
+  padding: 12px 14px;
+
+  border: 1px solid var(--border);
+
+  border-radius: 3px;
+
+  font-family: var(--font-mono);
+
+  font-size: 11px;
+
+  line-height: 1.6;
+}
+
+.contact__message--error {
+  color: #ff6b6b;
+
+  background: rgba(255, 107, 107, 0.06);
+
+  border-color: rgba(255, 107, 107, 0.3);
+}
+
+.contact__message--success {
+  color: var(--accent);
+
+  background: rgba(100, 255, 218, 0.05);
+
+  border-color: rgba(100, 255, 218, 0.3);
+}
+
+
+/* ============================================
+   ACCESSIBILITY
+============================================ */
+
+.form__group input:focus-visible,
+.form__group select:focus-visible,
+.form__group textarea:focus-visible,
+.contact__submit:focus-visible,
+.contact__details a:focus-visible {
+  outline: 2px solid var(--accent);
+
+  outline-offset: 2px;
+}
+
+
+/* ============================================
+   DISABLED INPUTS
+============================================ */
+
+.form__group input:disabled,
+.form__group select:disabled,
+.form__group textarea:disabled {
+  opacity: 0.6;
+
+  cursor: not-allowed;
+}
+
+
+/* ============================================
+   REDUCED MOTION
+============================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  .contact__submit {
+    transition: none;
+  }
+}

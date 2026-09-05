@@ -1,0 +1,280 @@
+/* =========================================
+   CLIENTS PAGE
+========================================= */
+
+.clients-page {
+  padding: 32px;
+  min-height: 100%;
+  color: var(--text-primary);
+}
+
+
+/* =========================================
+   HEADER
+========================================= */
+
+.clients-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+.clients-eyebrow {
+  margin-bottom: 8px;
+
+  color: var(--text-secondary);
+
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+
+  letter-spacing: 1px;
+}
+
+.clients-header h1 {
+  margin: 0 0 8px;
+
+  color: var(--text-primary);
+
+  font-family: var(--font-sans);
+  font-size: 32px;
+  font-weight: 600;
+  line-height: 1.2;
+
+  letter-spacing: -0.5px;
+}
+
+.clients-header p {
+  margin: 0;
+
+  color: var(--text-secondary);
+
+  font-family: var(--font-sans);
+  font-size: 14px;
+}
+
+
+/* =========================================
+   CLIENT COUNT
+========================================= */
+
+.clients-count {
+  min-width: 120px;
+
+  padding: 16px 20px;
+
+  border: 1px solid var(--border);
+  border-radius: 4px;
+
+  background: var(--bg-card);
+
+  text-align: center;
+}
+
+.clients-count span {
+  display: block;
+
+  color: var(--text-primary);
+
+  font-family: var(--font-sans);
+  font-size: 28px;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.clients-count small {
+  color: var(--text-secondary);
+
+  font-family: var(--font-mono);
+  font-size: 10px;
+}
+
+
+/* =========================================
+   TABLE
+========================================= */
+
+.clients-table-wrapper {
+  overflow-x: auto;
+
+  border: 1px solid var(--border);
+  border-radius: 4px;
+
+  background: var(--bg-card);
+}
+
+.clients-table {
+  width: 100%;
+
+  border-collapse: collapse;
+
+  color: var(--text-primary);
+}
+
+
+/* TABLE HEADER */
+
+.clients-table th {
+  padding: 16px;
+
+  border-bottom: 1px solid var(--border);
+
+  color: var(--text-secondary);
+
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+
+  text-align: left;
+  text-transform: uppercase;
+
+  letter-spacing: 0.7px;
+}
+
+
+/* TABLE BODY */
+
+.clients-table td {
+  padding: 18px 16px;
+
+  border-bottom: 1px solid var(--border);
+
+  color: var(--text-primary);
+
+  font-family: var(--font-sans);
+  font-size: 14px;
+}
+
+.clients-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.clients-table tbody tr {
+  transition: background-color 180ms ease;
+}
+
+.clients-table tbody tr:hover {
+  background: rgba(255, 255, 255, 0.025);
+}
+
+
+/* =========================================
+   CLIENT NAME
+========================================= */
+
+.client-name {
+  color: var(--text-primary);
+
+  font-family: var(--font-sans);
+  font-weight: 600;
+}
+
+.client-name--link {
+  color: var(--text-primary);
+
+  transition: color 180ms ease;
+}
+
+.client-name--link:hover {
+  color: var(--accent);
+}
+
+
+/* =========================================
+   CLIENT COUNT BADGE
+========================================= */
+
+.client-count {
+  display: inline-flex;
+
+  align-items: center;
+  justify-content: center;
+
+  min-width: 30px;
+  height: 28px;
+
+  padding: 0 8px;
+
+  border: 1px solid var(--border);
+  border-radius: 4px;
+
+  background: var(--bg-secondary);
+
+  color: var(--text-primary);
+
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+
+/* =========================================
+   STATES
+========================================= */
+
+.clients-loading,
+.clients-error,
+.clients-empty {
+  padding: 60px 24px;
+
+  border: 1px solid var(--border);
+  border-radius: 4px;
+
+  background: var(--bg-card);
+
+  text-align: center;
+}
+
+.clients-loading {
+  color: var(--text-secondary);
+
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+
+.clients-error {
+  color: #ff7b7b;
+
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+
+.clients-empty h2 {
+  margin-bottom: 8px;
+
+  color: var(--text-primary);
+
+  font-family: var(--font-sans);
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.clients-empty p {
+  color: var(--text-secondary);
+
+  font-family: var(--font-sans);
+  font-size: 14px;
+}
+
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 900px) {
+  .clients-page {
+    padding: 24px;
+  }
+
+  .clients-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .clients-count {
+    width: 100%;
+  }
+}

@@ -1,0 +1,188 @@
+.hero {
+  position: relative;
+
+  min-height: 100vh;
+
+  display: flex;
+  align-items: center;
+
+  padding-top: 88px;
+}
+
+.hero__container {
+  display: flex;
+  align-items: center;
+}
+
+.hero__content {
+  max-width: 900px;
+}
+
+.hero__eyebrow {
+  margin-bottom: 20px;
+
+  color: var(--accent);
+
+  font-family: var(--font-mono);
+  font-size: 14px;
+}
+
+.hero__title {
+  margin-bottom: 8px;
+
+  color: var(--text-primary);
+
+  font-size: clamp(42px, 8vw, 76px);
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -2px;
+}
+
+.hero__subtitle {
+  margin-bottom: 28px;
+
+  color: var(--text-secondary);
+
+  font-size: clamp(32px, 6vw, 64px);
+  font-weight: 600;
+  line-height: 1.08;
+  letter-spacing: -2px;
+}
+
+.hero__description {
+  max-width: 620px;
+
+  margin-bottom: 36px;
+
+  color: var(--text-secondary);
+
+  font-size: 18px;
+  line-height: 1.7;
+}
+
+.hero__actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+
+  margin-bottom: 32px;
+}
+
+.hero__button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-width: 130px;
+  padding: 14px 20px;
+
+  border: 1px solid var(--accent);
+  border-radius: 4px;
+
+  font-family: var(--font-mono);
+  font-size: 13px;
+
+  transition:
+    background-color 200ms ease,
+    color 200ms ease,
+    transform 200ms ease;
+}
+
+.hero__button:hover {
+  transform: translateY(-3px);
+}
+
+.hero__button--primary {
+  background: var(--accent);
+  color: var(--bg-primary);
+}
+
+.hero__button--primary:hover {
+  background: transparent;
+  color: var(--accent);
+}
+
+.hero__button--secondary {
+  color: var(--accent);
+}
+
+.hero__button--secondary:hover {
+  background: rgba(100, 255, 218, 0.08);
+}
+
+.hero__socials {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+
+  font-family: var(--font-mono);
+  font-size: 13px;
+}
+
+.hero__socials a {
+  color: var(--text-secondary);
+
+  transition: color 200ms ease;
+}
+
+.hero__socials a:hover {
+  color: var(--accent);
+}
+
+.hero__scroll {
+  position: absolute;
+
+  right: 40px;
+  bottom: 40px;
+
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  color: var(--text-secondary);
+
+  font-family: var(--font-mono);
+  font-size: 11px;
+
+  writing-mode: vertical-rl;
+}
+
+.hero__scroll-line {
+  width: 1px;
+  height: 48px;
+
+  background: var(--accent);
+}
+
+@media (max-width: 900px) {
+  .hero__scroll {
+    display: none;
+  }
+}
+
+@media (max-width: 600px) {
+  .hero {
+    min-height: 90vh;
+  }
+
+  .hero__title {
+    letter-spacing: -1px;
+  }
+
+  .hero__subtitle {
+    letter-spacing: -1px;
+  }
+
+  .hero__description {
+    font-size: 16px;
+  }
+
+  .hero__actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .hero__button {
+    width: 100%;
+  }
+}
