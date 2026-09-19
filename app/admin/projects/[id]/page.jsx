@@ -11,7 +11,7 @@ import {
   getProjectById,
   updateProject,
   deleteProject,
-} from "@/app/lib/api";
+} from "@/lib/api";
 
 import "../projects.css";
 

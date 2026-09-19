@@ -3,48 +3,36 @@
 import { useState } from "react";
 
 import "../styles/Contact.css";
-
 import { createEnquiry } from "../lib/api";
 
 const INITIAL_FORM = {
   name: "",
   email: "",
   projectType: "",
-  budget: "",
   message: "",
+  website: "", // honeypot
 };
 
+const PROJECT_TYPES = [
+  { value: "web-app", label: "Web Application" },
+  { value: "backend", label: "Backend / API" },
+  { value: "shopify", label: "Shopify" },
+  { value: "bug-fix", label: "Bug Fix / Improvement" },
+  { value: "other", label: "Other" },
+];
+
 export default function Contact() {
-  const [form, setForm] =
-    useState(INITIAL_FORM);
-
-  const [loading, setLoading] =
-    useState(false);
-
-  const [success, setSuccess] =
-    useState("");
-
-  const [error, setError] =
-    useState("");
+  const [form, setForm] = useState(INITIAL_FORM);
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState("");
+  const [error, setError] = useState("");
 
   function handleChange(event) {
-    const {
-      name,
-      value,
-    } = event.target;
+    const { name, value } = event.target;
+    setForm((current) => ({ ...current, [name]: value }));
 
-    setForm((current) => ({
-      ...current,
-      [name]: value,
-    }));
-
-    if (error) {
-      setError("");
-    }
-
-    if (success) {
-      setSuccess("");
-    }
+    if (error) setError("");
+    if (success) setSuccess("");
   }
 
   async function handleSubmit(event) {
@@ -53,61 +41,26 @@ export default function Contact() {
     setError("");
     setSuccess("");
 
-    const name =
-      form.name.trim();
-
-    const email =
-      form.email.trim();
-
-    const message =
-      form.message.trim();
-
-    /* =================================================
-       VALIDATION
-       ================================================= */
-
-    if (!name) {
-      setError(
-        "Please enter your name."
-      );
+    // Honeypot — silently accept if filled
+    if (form.website.trim() !== "") {
+      setSuccess("Thanks! Your enquiry has been sent.");
+      setForm(INITIAL_FORM);
       return;
     }
 
-    if (!email) {
-      setError(
-        "Please enter your email."
-      );
-      return;
+    const name = form.name.trim();
+    const email = form.email.trim();
+    const message = form.message.trim();
+
+    if (!name) return setError("Please enter your name.");
+    if (!email) return setError("Please enter your email.");
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return setError("Please enter a valid email address.");
     }
 
-    if (
-      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
-        email
-      )
-    ) {
-      setError(
-        "Please enter a valid email address."
-      );
-      return;
-    }
-
-    if (!form.projectType) {
-      setError(
-        "Please select a project type."
-      );
-      return;
-    }
-
-    if (!message) {
-      setError(
-        "Please tell me about your project."
-      );
-      return;
-    }
-
-    /* =================================================
-       SUBMIT
-       ================================================= */
+    if (!form.projectType) return setError("Please select a project type.");
+    if (!message) return setError("Please tell me about your project.");
 
     try {
       setLoading(true);
@@ -115,27 +68,16 @@ export default function Contact() {
       await createEnquiry({
         name,
         email,
-        projectType:
-          form.projectType,
-        budget:
-          form.budget || null,
+        projectType: form.projectType,
         message,
       });
 
-      setSuccess(
-        "Thanks! Your enquiry has been sent successfully. I'll get back to you soon."
-      );
-
+      setSuccess("Thanks! Your enquiry has been sent. I'll be in touch soon.");
       setForm(INITIAL_FORM);
-    } catch (error) {
-      console.error(
-        "Failed to submit enquiry:",
-        error
-      );
-
+    } catch (err) {
+      console.error("Failed to submit enquiry:", err);
       setError(
-        error?.message ||
-          "Unable to send your enquiry. Please try again."
+        err?.message || "Unable to send your enquiry. Please try again."
       );
     } finally {
       setLoading(false);
@@ -143,111 +85,98 @@ export default function Contact() {
   }
 
   return (
-    <section
-      id="contact"
-      className="contact"
-      aria-labelledby="contact-title"
-    >
-      <div className="container">
+    <section id="contact" className="contact" aria-labelledby="contact-title">
+      <div className="container contact__container">
+        {/* ----------------------------------------
+            LABEL
+            ---------------------------------------- */}
 
-        {/* =================================================
-            HEADER
-            ================================================= */}
+        <p className="contact__label">Contact</p>
 
-        <div className="contact__header">
-
-          <p className="eyebrow">
-            05. Contact
-          </p>
-
-          <span className="contact__header-mark">
-            LET'S TALK
-          </span>
-
-        </div>
+        {/* ----------------------------------------
+            GRID
+            ---------------------------------------- */}
 
         <div className="contact__grid">
-
-          {/* =================================================
-              CONTENT
-              ================================================= */}
+          {/* --------------------------------
+              LEFT — CONTENT
+              -------------------------------- */}
 
           <div className="contact__content">
-
-            <h2
-              id="contact-title"
-              className="section-title"
-            >
-              Let's build
+            <h2 id="contact-title" className="contact__heading">
+              Let&rsquo;s build
               <br />
-              something{" "}
-              <span>
-                together.
-              </span>
+              something <em>together.</em>
             </h2>
 
-            <p>
-              Have a project, idea, or
-              technical problem you'd
-              like help with?
+            <p className="contact__lead">
+              Have a project, idea, or technical problem you&rsquo;d
+              like help with? Tell me what you&rsquo;re trying to
+              build and I&rsquo;ll get back to you with next steps.
             </p>
-
-            <p>
-              Tell me what you're trying
-              to build and I'll get back
-              to you with the next steps.
-            </p>
-
-            {/* CONTACT DETAILS */}
 
             <div className="contact__details">
-
               <a
                 href="mailto:avinashvishwakarmawork@gmail.com"
+                className="contact__detail"
               >
-                avinashvishwakarmawork@gmail.com
+                <span className="contact__detail-label">Email</span>
+                <span className="contact__detail-value">
+                  avinashvishwakarmawork@gmail.com
+                </span>
               </a>
 
               <a
                 href="https://github.com/Avinash12344"
                 target="_blank"
                 rel="noopener noreferrer"
+                className="contact__detail"
               >
-                GitHub
-                <span>↗</span>
+                <span className="contact__detail-label">GitHub</span>
+                <span className="contact__detail-value">
+                  @Avinash12344 <span aria-hidden="true">↗</span>
+                </span>
               </a>
 
               <a
                 href="https://www.linkedin.com/in/avinash-vishwakarma-59b7a71b3"
                 target="_blank"
                 rel="noopener noreferrer"
+                className="contact__detail"
               >
-                LinkedIn
-                <span>↗</span>
+                <span className="contact__detail-label">LinkedIn</span>
+                <span className="contact__detail-value">
+                  Avinash Vishwakarma <span aria-hidden="true">↗</span>
+                </span>
               </a>
-
             </div>
-
           </div>
 
-          {/* =================================================
-              FORM
-              ================================================= */}
+          {/* --------------------------------
+              RIGHT — FORM
+              -------------------------------- */}
 
           <form
             className="contact__form"
             onSubmit={handleSubmit}
             noValidate
           >
+            {/* Honeypot */}
+            <div className="contact__honeypot" aria-hidden="true">
+              <label htmlFor="website">Website (leave blank)</label>
+              <input
+                id="website"
+                name="website"
+                type="text"
+                tabIndex={-1}
+                autoComplete="off"
+                value={form.website}
+                onChange={handleChange}
+              />
+            </div>
 
-            {/* NAME */}
-
-            <div className="form__group">
-
-              <label htmlFor="name">
-                01. Name
-              </label>
-
+            <div className="contact__field">
+              <label htmlFor="name">Name</label>
               <input
                 id="name"
                 name="name"
@@ -258,17 +187,10 @@ export default function Contact() {
                 autoComplete="name"
                 disabled={loading}
               />
-
             </div>
 
-            {/* EMAIL */}
-
-            <div className="form__group">
-
-              <label htmlFor="email">
-                02. Email
-              </label>
-
+            <div className="contact__field">
+              <label htmlFor="email">Email</label>
               <input
                 id="email"
                 name="email"
@@ -279,167 +201,80 @@ export default function Contact() {
                 autoComplete="email"
                 disabled={loading}
               />
-
             </div>
 
-            {/* PROJECT + BUDGET */}
+            <div className="contact__field">
+              <label>Project type</label>
 
-            <div className="form__row">
+              <div className="contact__chips">
+                {PROJECT_TYPES.map((type) => {
+                  const isActive = form.projectType === type.value;
 
-              <div className="form__group">
-
-                <label htmlFor="projectType">
-                  03. Project Type
-                </label>
-
-                <select
-                  id="projectType"
-                  name="projectType"
-                  value={form.projectType}
-                  onChange={handleChange}
-                  disabled={loading}
-                >
-
-                  <option value="">
-                    Select
-                  </option>
-
-                  <option value="web-app">
-                    Web Application
-                  </option>
-
-                  <option value="backend">
-                    Backend / API
-                  </option>
-
-                  <option value="shopify">
-                    Shopify
-                  </option>
-
-                  <option value="bug-fix">
-                    Bug Fix / Improvement
-                  </option>
-
-                  <option value="other">
-                    Other
-                  </option>
-
-                </select>
-
+                  return (
+                    <button
+                      type="button"
+                      key={type.value}
+                      className={
+                        isActive
+                          ? "contact__chip contact__chip--active"
+                          : "contact__chip"
+                      }
+                      onClick={() => {
+                        setForm((c) => ({ ...c, projectType: type.value }));
+                        if (error) setError("");
+                      }}
+                      disabled={loading}
+                      aria-pressed={isActive}
+                    >
+                      {type.label}
+                    </button>
+                  );
+                })}
               </div>
-
-              <div className="form__group">
-
-                <label htmlFor="budget">
-                  04. Budget
-                </label>
-
-                <select
-                  id="budget"
-                  name="budget"
-                  value={form.budget}
-                  onChange={handleChange}
-                  disabled={loading}
-                >
-
-                  <option value="">
-                    Select
-                  </option>
-
-                  <option value="under-10k">
-                    Under ₹10K
-                  </option>
-
-                  <option value="10k-25k">
-                    ₹10K – ₹25K
-                  </option>
-
-                  <option value="25k-50k">
-                    ₹25K – ₹50K
-                  </option>
-
-                  <option value="50k-plus">
-                    ₹50K+
-                  </option>
-
-                  <option value="discuss">
-                    Let's discuss
-                  </option>
-
-                </select>
-
-              </div>
-
             </div>
 
-            {/* MESSAGE */}
-
-            <div className="form__group">
-
-              <label htmlFor="message">
-                05. Tell me about your project
-              </label>
-
+            <div className="contact__field">
+              <label htmlFor="message">Project details</label>
               <textarea
                 id="message"
                 name="message"
-                rows="6"
+                rows="5"
                 value={form.message}
                 onChange={handleChange}
                 placeholder="What are you trying to build?"
                 disabled={loading}
               />
-
             </div>
 
-            {/* =================================================
-                FEEDBACK
-                ================================================= */}
-
             {error && (
-              <div
-                className="contact__message contact__message--error"
-                role="alert"
-              >
+              <div className="contact__feedback contact__feedback--error" role="alert">
                 {error}
               </div>
             )}
 
             {success && (
               <div
-                className="contact__message contact__message--success"
+                className="contact__feedback contact__feedback--success"
                 role="status"
               >
                 {success}
               </div>
             )}
 
-            {/* =================================================
-                SUBMIT
-                ================================================= */}
-
             <button
               type="submit"
               className="contact__submit"
               disabled={loading}
             >
-              <span>
-                {loading
-                  ? "Sending..."
-                  : "Send Enquiry"}
-              </span>
-
+              {loading ? "Sending..." : "Send enquiry"}
               {!loading && (
-                <span aria-hidden="true">
-                  ↗
+                <span className="contact__submit-arrow" aria-hidden="true">
+                  →
                 </span>
               )}
             </button>
-
           </form>
-
         </div>
-
       </div>
     </section>
   );

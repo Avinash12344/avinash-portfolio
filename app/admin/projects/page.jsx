@@ -8,7 +8,7 @@ import {
   createProject,
   getClients,
   getProposalsAdmin
-} from "@/app/lib/api";
+} from "../../lib/api";
 import "./projects.css"
 import { useRouter } from "next/navigation";
 

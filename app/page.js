@@ -8,32 +8,41 @@ import Stats from "./components/Stats";
 import Reviews from "./components/Reviews";
 import Contact from "./components/Contact";
 import Footer from "./components/Footer";
-import { getPortfolio } from "./lib/api";
+import { getPortfolio, getWork } from "./lib/api";
 
 export default async function Home() {
   let portfolio = null;
+  let work = [];
 
-  try {
-    const response = await getPortfolio();
-    portfolio = response?.data || null;
-  } catch (error) {
-    console.error("Failed to load portfolio:", error);
+  // allSettled so one failing endpoint doesn't blank the whole page
+  const [portfolioResult, workResult] = await Promise.allSettled([
+    getPortfolio(),
+    getWork(),
+  ]);
+
+  if (portfolioResult.status === "fulfilled") {
+    portfolio = portfolioResult.value?.data || null;
+  } else {
+    console.error("Failed to load portfolio:", portfolioResult.reason);
+  }
+
+  if (workResult.status === "fulfilled") {
+    work = workResult.value?.data || [];
+  } else {
+    console.error("Failed to load work:", workResult.reason);
   }
 
   return (
     <>
       <Navbar />
-
-      <main>
-        <Hero profile={portfolio?.profile} />
-        <About profile={portfolio?.profile} />
-        <Services services={portfolio?.services} />
-        <Projects projects={portfolio?.projects} />
-        <Reviews reviews={portfolio?.reviews} />
-        <Contact />
-        <Stats stats={portfolio?.stats} />
-      </main>
-
+      <Hero profile={portfolio?.profile} skills={portfolio?.skills} />
+      <About profile={portfolio?.profile} services={portfolio?.services} />
+      <Services services={portfolio?.services} />
+      <Projects work={work} />
+      <Skills skills={portfolio?.skills} />
+      <Stats stats={portfolio?.stats} />
+      <Reviews reviews={portfolio?.reviews} />
+      <Contact />
       <Footer />
     </>
   );

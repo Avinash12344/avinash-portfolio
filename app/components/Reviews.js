@@ -4,174 +4,80 @@ import "../styles/Reviews.css";
 
 export default function Reviews({ reviews }) {
   const reviewList = Array.isArray(reviews)
-    ? reviews
+    ? reviews.filter((r) => r && r.is_published !== false)
     : [];
 
+  // Hide entire section when no published reviews exist
+  if (reviewList.length === 0) return null;
+
   return (
-    <section
-      id="reviews"
-      className="reviews"
-      aria-labelledby="reviews-title"
-    >
-      <div className="container">
+    <section id="reviews" className="reviews" aria-labelledby="reviews-title">
+      <div className="container reviews__container">
+        {/* ----------------------------------------
+            LABEL
+            ---------------------------------------- */}
 
-        {/* =================================================
-            SECTION HEADER
-            ================================================= */}
+        <p className="reviews__label">Testimonials</p>
 
-        <div className="reviews__header">
+        {/* ----------------------------------------
+            HEADER
+            ---------------------------------------- */}
 
-          <div className="reviews__title">
-            <p className="eyebrow">
-              04. Testimonials
-            </p>
+        <div className="reviews__top">
+          <h2 id="reviews-title" className="reviews__heading">
+            What clients <em>say.</em>
+          </h2>
 
-            <h2
-              id="reviews-title"
-              className="section-title"
-            >
-              What clients{" "}
-              <span>say.</span>
-            </h2>
-          </div>
-
-          <div className="reviews__intro">
-            <p>
-              Honest feedback from people I've
-              worked with on real projects,
-              products and technical solutions.
-            </p>
-
-            <span>
-              CLIENT FEEDBACK
-            </span>
-          </div>
-
+          <p className="reviews__aside">
+            Feedback from people I&rsquo;ve worked with on real
+            projects and long-term engagements.
+          </p>
         </div>
 
-        {/* =================================================
-            REVIEWS
-            ================================================= */}
+        {/* ----------------------------------------
+            LIST
+            ---------------------------------------- */}
 
-        {reviewList.length === 0 ? (
+        <div className="reviews__grid">
+          {reviewList.map((review, index) => {
+            const rating = Math.min(
+              Math.max(Number(review.rating) || 0, 0),
+              5
+            );
 
-          <div className="reviews__empty">
-
-            <div
-              className="reviews__empty-mark"
-              aria-hidden="true"
-            >
-              “
-            </div>
-
-            <p>
-              No client reviews have been
-              published yet.
-            </p>
-
-            <span>
-              Approved client feedback will
-              appear here.
-            </span>
-
-          </div>
-
-        ) : (
-
-          <div className="reviews__grid">
-
-            {reviewList.map((review, index) => {
-
-              const rating = Math.min(
-                Math.max(
-                  Number(review.rating) || 0,
-                  0
-                ),
-                5
-              );
-
-              return (
-                <article
-                  className="review-card"
-                  key={
-                    review.id ||
-                    `review-${index}`
-                  }
-                >
-
-                  {/* TOP */}
-
-                  <div className="review-card__top">
-
-                    <span className="review-card__number">
-                      {String(index + 1).padStart(
-                        2,
-                        "0"
-                      )}
+            return (
+              <article
+                className="review"
+                key={review.id || `review-${index}`}
+              >
+                <div className="review__rating" aria-label={`${rating} out of 5`}>
+                  <span aria-hidden="true">
+                    {"★".repeat(rating)}
+                    <span className="review__rating-empty">
+                      {"★".repeat(5 - rating)}
                     </span>
+                  </span>
+                </div>
 
-                    <div
-                      className="review-card__rating"
-                      aria-label={`${rating} out of 5 stars`}
-                    >
-                      {"★".repeat(rating)}
-                      {"☆".repeat(5 - rating)}
-                    </div>
+                <blockquote className="review__quote">
+                  {review.testimonial}
+                </blockquote>
 
-                  </div>
+                <div className="review__author">
+                  <strong className="review__name">
+                    {review.client_name}
+                  </strong>
 
-                  {/* QUOTE */}
-
-                  <div className="review-card__quote">
-
-                    <span
-                      className="review-card__quote-mark"
-                      aria-hidden="true"
-                    >
-                      “
+                  {review.project_name && (
+                    <span className="review__project">
+                      {review.project_name}
                     </span>
-
-                    <blockquote>
-                      {review.testimonial ||
-                        "Great working experience."}
-                    </blockquote>
-
-                  </div>
-
-                  {/* CLIENT */}
-
-                  <div className="review-card__client">
-
-                    <div>
-                      <strong>
-                        {review.client_name ||
-                          "Client"}
-                      </strong>
-
-                      {review.project_name && (
-                        <span>
-                          {review.project_name}
-                        </span>
-                      )}
-                    </div>
-
-                    <span
-                      className="review-card__arrow"
-                      aria-hidden="true"
-                    >
-                      ↗
-                    </span>
-
-                  </div>
-
-                </article>
-              );
-            })}
-
-          </div>
-
-        )}
-
+                  )}
+                </div>
+              </article>
+            );
+          })}
+        </div>
       </div>
     </section>
   );

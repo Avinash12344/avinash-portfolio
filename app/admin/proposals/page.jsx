@@ -104,20 +104,7 @@ export default function ProposalsPage() {
       throw new Error("Authentication required.");
     }
 
-    console.log("Updating proposal:", {
-      id,
-      status,
-      tokenExists: !!token,
-    });
-
-    const response = await updateProposalStatus(
-      id,
-      status,
-      token
-    );
-
-    console.log("Update response:", response);
-
+    const response = await updateProposalStatus(id, status);
     const updatedProposal = response.data;
 
     setProposals((current) =>
@@ -222,11 +209,13 @@ export default function ProposalsPage() {
           </div>
 
           <button
-            className="proposal-primary-button"
-            type="button"
-          >
-            + Create Proposal
-          </button>
+  className="proposal-primary-button"
+  type="button"
+  disabled
+  title="Coming soon"
+>
+  + Create Proposal
+</button>
         </div>
 
 

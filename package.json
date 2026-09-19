@@ -9,13 +9,17 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@umami/node": "^0.4.0",
     "next": "16.3.1",
     "react": "19.2.8",
     "react-dom": "19.2.8"
   },
   "devDependencies": {
+    "@types/node": "26.6.2",
+    "@types/react": "19.3.0",
     "babel-plugin-react-compiler": "1.0.0",
     "eslint": "^9",
-    "eslint-config-next": "16.3.1"
+    "eslint-config-next": "16.3.1",
+    "typescript": "^6.0.3"
   }
 }

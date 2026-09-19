@@ -2,144 +2,106 @@
 
 import "../styles/About.css";
 
-const highlights = [
-  "Modern web application development",
-  "REST API & backend development",
-  "React / Next.js applications",
-  "Shopify application development",
-  "Database-driven applications",
-  "API integration & debugging",
-];
+export default function About({ profile, services }) {
+  if (!profile?.name) return null;
 
-export default function About({ profile }) {
-  const aboutParagraphs = profile?.about
-    ? profile.about
+  const { about, location, availability } = profile;
+
+  const aboutParagraphs = about
+    ? about
         .split("\n")
-        .map((paragraph) => paragraph.trim())
+        .map((p) => p.trim())
         .filter(Boolean)
     : [];
 
-  return (
-    <section
-      id="about"
-      className="about"
-      aria-labelledby="about-title"
-    >
-      <div className="container">
-        <div className="about__top">
-          <p className="eyebrow">01. About Me</p>
-    
-          <span className="about__top-label">
-            DEVELOPER / BUILDER
-          </span>
-        </div>
+  const helpItems = Array.isArray(services)
+    ? services.filter((s) => s && s.is_active !== false).slice(0, 6)
+    : [];
 
-        <div className="about__heading">
-          <h2 id="about-title">
-            Building useful
+  return (
+    <section id="about" className="about" aria-labelledby="about-title">
+      <div className="container about__container">
+        {/* ----------------------------------------
+            LABEL
+            ---------------------------------------- */}
+
+        <p className="about__label">About</p>
+
+        {/* ----------------------------------------
+            HEADLINE + ASIDE
+            ---------------------------------------- */}
+
+        <div className="about__top">
+          <h2 id="about-title" className="about__heading">
+            I build software that
             <br />
-            <span>things with code.</span>
+            <em>earns its keep.</em>
           </h2>
 
-          <div className="about__number">
-            <span>01</span>
-            <span>ABOUT</span>
-          </div>
+          <p className="about__aside">
+            Years of shipping web apps, APIs, and Shopify work — the
+            kind that runs in production without needing a babysitter.
+          </p>
         </div>
+
+        {/* ----------------------------------------
+            BODY GRID
+            ---------------------------------------- */}
 
         <div className="about__grid">
-          <div className="about__content">
+          {/* Bio */}
+          <div className="about__bio">
             {aboutParagraphs.length > 0 ? (
-              aboutParagraphs.map((paragraph, index) => (
-                <p key={index}>{paragraph}</p>
-              ))
+              aboutParagraphs.map((p, i) => <p key={i}>{p}</p>)
             ) : (
-              <>
-                <p>
-                  I'm Avinash Vishwakarma, a software
-                  developer focused on building modern web
-                  applications, APIs, and backend systems.
-                </p>
-
-                <p>
-                  I enjoy taking an idea or business
-                  requirement and turning it into a clean,
-                  functional, and maintainable product.
-                </p>
-
-                <p>
-                  My experience includes React, JavaScript,
-                  Node.js, databases, APIs, and Shopify
-                  development.
-                </p>
-              </>
+              <p className="about__empty">Bio coming soon.</p>
             )}
 
-            <div className="about__meta">
-              {profile?.location && (
-                <div>
-                  <span>LOCATION</span>
-                  <strong>{profile.location}</strong>
+            <dl className="about__meta">
+              {location && (
+                <div className="about__meta-item">
+                  <dt>Based in</dt>
+                  <dd>{location}</dd>
                 </div>
               )}
 
-              {profile?.availability !== undefined && (
-                <div>
-                  <span>STATUS</span>
-
-                  <strong
-                    className={
-                      profile.availability
-                        ? "availability available"
-                        : "availability unavailable"
-                    }
-                  >
-                    <i aria-hidden="true" />
-                    {profile.availability
-                      ? "Available for new projects"
-                      : "Currently unavailable"}
-                  </strong>
+              {availability !== undefined && (
+                <div className="about__meta-item">
+                  <dt>Status</dt>
+                  <dd>
+                    <span
+                      className={`about__status ${
+                        availability ? "about__status--on" : ""
+                      }`}
+                    >
+                      <span className="about__status-dot" aria-hidden="true" />
+                      {availability
+                        ? "Open to new projects"
+                        : "Currently unavailable"}
+                    </span>
+                  </dd>
                 </div>
               )}
-            </div>
+            </dl>
           </div>
 
-          <aside
-            className="about__highlights"
-            aria-labelledby="about-highlights-title"
-          >
-            <div className="about__highlights-header">
-              <span>02</span>
+          {/* Help list */}
+          {helpItems.length > 0 && (
+            <aside className="about__help" aria-labelledby="about-help-title">
+              <h3 id="about-help-title" className="about__help-title">
+                What I can help with
+              </h3>
 
-              <p id="about-highlights-title">
-                WHAT I CAN HELP WITH
-              </p>
-            </div>
-
-            <ul>
-              {highlights.map((highlight, index) => (
-                <li key={highlight}>
-                  <span className="about__highlight-number">
-                    {String(index + 1).padStart(2, "0")}
-                  </span>
-
-                  <span className="about__highlight-text">
-                    {highlight}
-                  </span>
-
-                  <span
-                    className="about__highlight-arrow"
-                    aria-hidden="true"
-                  >
-                    ↗
-                  </span>
-                </li>
-              ))}
-            </ul>
-          </aside>
+              <ul className="about__help-list">
+                {helpItems.map((service) => (
+                  <li key={service.id} className="about__help-item">
+                    {service.title}
+                  </li>
+                ))}
+              </ul>
+            </aside>
+          )}
         </div>
-
-        
       </div>
     </section>
   );

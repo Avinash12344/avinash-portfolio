@@ -2,130 +2,75 @@
 
 import "../styles/Skills.css";
 
-const fallbackSkills = [
-  {
-    id: "fallback-1",
-    name: "JavaScript",
-    category: "Frontend / Backend",
-    proficiency: 85,
-  },
-  {
-    id: "fallback-2",
-    name: "React",
-    category: "Frontend",
-    proficiency: 85,
-  },
-  {
-    id: "fallback-3",
-    name: "Node.js",
-    category: "Backend",
-    proficiency: 80,
-  },
-  {
-    id: "fallback-4",
-    name: "PostgreSQL",
-    category: "Database",
-    proficiency: 75,
-  },
-];
+function groupByCategory(skills) {
+  const grouped = new Map();
+
+  for (const skill of skills) {
+    const cat = (skill.category || "Other").trim();
+    if (!grouped.has(cat)) grouped.set(cat, []);
+    grouped.get(cat).push(skill.name);
+  }
+
+  return Array.from(grouped.entries()).map(([category, items]) => ({
+    category,
+    skills: items,
+  }));
+}
 
 export default function Skills({ skills }) {
-  const activeSkills =
-    Array.isArray(skills)
-      ? skills.filter(
-          (skill) =>
-            skill &&
-            skill.is_active !== false
-        )
-      : [];
+  const activeSkills = Array.isArray(skills)
+    ? skills.filter((s) => s && s.is_active !== false)
+    : [];
 
-  const skillList =
-    activeSkills.length > 0
-      ? activeSkills
-      : fallbackSkills;
+  if (activeSkills.length === 0) return null;
+
+  const groups = groupByCategory(activeSkills);
 
   return (
-    <section
-      id="skills"
-      className="skills"
-      aria-labelledby="skills-title"
-    >
-      <div className="container">
-        <p className="eyebrow">
-          03. Skills
-        </p>
+    <section id="skills" className="skills" aria-labelledby="skills-title">
+      <div className="container skills__container">
+        {/* ----------------------------------------
+            LABEL
+            ---------------------------------------- */}
 
-        <div className="skills__header">
-          <h2
-            id="skills-title"
-            className="section-title"
-          >
-            Technologies I{" "}
-            <span>work with.</span>
+        <p className="skills__label">Stack</p>
+
+        {/* ----------------------------------------
+            HEADER
+            ---------------------------------------- */}
+
+        <div className="skills__top">
+          <h2 id="skills-title" className="skills__heading">
+            Tools I <em>reach for.</em>
           </h2>
 
-          <p className="skills__intro">
-            Technologies and tools I use to build
-            reliable applications and solve real
-            engineering problems.
+          <p className="skills__aside">
+            Technologies I use day to day. Depth is better judged
+            from the work above.
           </p>
         </div>
 
-        <div className="skills__grid">
-          {skillList.map((skill, index) => {
-            const proficiency =
-              skill.proficiency !== null &&
-              skill.proficiency !== undefined
-                ? Math.min(
-                    Math.max(
-                      Number(skill.proficiency) || 0,
-                      0
-                    ),
-                    100
-                  )
-                : null;
+        {/* ----------------------------------------
+            GROUPS
+            ---------------------------------------- */}
 
-            return (
-              <article
-                className="skill-card"
-                key={skill.id || index}
-              >
-                <div className="skill-card__top">
-                  <h3>{skill.name}</h3>
+        <dl className="skills__groups">
+          {groups.map((group) => (
+            <div className="skill-group" key={group.category}>
+              <dt className="skill-group__label">
+                {group.category.toUpperCase()}
+              </dt>
 
-                  {proficiency !== null && (
-                    <span>
-                      {proficiency}%
-                    </span>
-                  )}
-                </div>
-
-                {skill.category && (
-                  <p className="skill-card__category">
-                    {skill.category}
-                  </p>
-                )}
-
-                {proficiency !== null && (
-                  <div
-                    className="skill-card__bar"
-                    role="progressbar"
-                    aria-valuenow={proficiency}
-                    aria-valuemin="0"
-                    aria-valuemax="100"
-                    aria-label={`${skill.name} proficiency`}
-                  >
-                    <span
-                      style={{
-                        width: `${proficiency}%`,
-                      }}
-                    />
-                  </div>
-                )}
-              </article>
-            );
-          })}
-        </div>
+              <dd className="skill-group__items">
+                {group.skills.map((name) => (
+                  <span key={name} className="skill-group__item">
+                    {name}
+                  </span>
+                ))}
+              </dd>
+            </div>
+          ))}
+        </dl>
       </div>
     </section>
   );

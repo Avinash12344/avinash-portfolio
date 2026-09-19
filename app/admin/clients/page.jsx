@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { getClients } from "../../lib/api";
 import "./clients.css";
@@ -121,12 +122,12 @@ export default function ClientsPage() {
                 <tr key={client.id}>
 
                   <td>
-                    <a
+                   <Link
   href={`/admin/clients/${client.id}`}
   className="client-name client-name--link"
 >
   {client.name}
-</a>
+</Link>
                   </td>
 
                   <td>

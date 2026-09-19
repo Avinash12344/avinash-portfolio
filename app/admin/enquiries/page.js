@@ -10,15 +10,15 @@ import {
 
 import "./enquiries.css";
 
-const statuses = [
+// Must match backend: src/schemas/enquiry.schema.js → STATUSES
+const STATUSES = [
   "NEW",
   "CONTACTED",
   "QUALIFIED",
   "PROPOSAL_SENT",
-  "NEGOTIATION",
-  "ACCEPTED",
-  "REJECTED",
-  "CANCELLED",
+  "WON",
+  "LOST",
+  "ARCHIVED",
 ];
 
 function formatBudget(budget) {
@@ -35,448 +35,225 @@ function formatBudget(budget) {
 
 export default function EnquiriesPage() {
   const [enquiries, setEnquiries] = useState([]);
-
   const [loading, setLoading] = useState(true);
-
   const [error, setError] = useState("");
-
   const [search, setSearch] = useState("");
-
-  const [statusFilter, setStatusFilter] =
-    useState("ALL");
+  const [statusFilter, setStatusFilter] = useState("ALL");
 
   async function loadEnquiries() {
-  try {
-    setLoading(true);
-    setError("");
+    try {
+      setLoading(true);
+      setError("");
 
-    const response = await getEnquiries();
-
-    setEnquiries(response.data || []);
-  } catch (error) {
-    console.error("Failed to load enquiries:", error);
-    setError(error.message);
-  } finally {
-    setLoading(false);
+      const response = await getEnquiries();
+      setEnquiries(response.data || []);
+    } catch (err) {
+      console.error("Failed to load enquiries:", err);
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   }
-}
 
   useEffect(() => {
     loadEnquiries();
   }, []);
 
-
-  // ==========================================
-  // UPDATE STATUS
-  // ==========================================
-
   async function handleStatusChange(id, status) {
-  try {
-    const token = localStorage.getItem("admin_token");
-
-    if (!token) {
-      throw new Error("Authentication required.");
+    try {
+      setError("");
+      await updateEnquiryStatus(id, status);
+      await loadEnquiries();
+    } catch (err) {
+      console.error("Failed to update enquiry status:", err);
+      setError(err.message);
     }
-
-    await updateEnquiryStatus(
-      id,
-      status,
-      token
-    );
-
-    // Reload enquiries
-    await loadEnquiries();
-
-  } catch (error) {
-    console.error(
-      "Failed to update enquiry status:",
-      error
-    );
-
-    setError(error.message);
   }
-}
 
+  async function handleDelete(id) {
+    if (!confirm("Delete this enquiry?")) return;
 
-  // ==========================================
-  // DELETE
-  // ==========================================
-
-  const handleDelete = async (id) => {
-  try {
-    await deleteEnquiry(id);
-
-    await loadEnquiries();
-  } catch (error) {
-    console.error(
-      "Failed to delete enquiry:",
-      error
-    );
-
-    setError(error.message);
+    try {
+      setError("");
+      await deleteEnquiry(id);
+      await loadEnquiries();
+    } catch (err) {
+      console.error("Failed to delete enquiry:", err);
+      setError(err.message);
+    }
   }
-};
 
+  const filteredEnquiries = enquiries.filter((enquiry) => {
+    const query = search.toLowerCase().trim();
 
-  // ==========================================
-  // FILTER
-  // ==========================================
+    const matchesSearch =
+      !query ||
+      enquiry.client_name?.toLowerCase().includes(query) ||
+      enquiry.client_email?.toLowerCase().includes(query) ||
+      enquiry.client_company?.toLowerCase().includes(query) ||
+      enquiry.project_type?.toLowerCase().includes(query);
 
-  const filteredEnquiries =
-    enquiries.filter((enquiry) => {
+    const matchesStatus =
+      statusFilter === "ALL" || enquiry.status === statusFilter;
 
-      const query =
-        search
-          .toLowerCase()
-          .trim();
-
-      const matchesSearch =
-        !query ||
-        enquiry.client_name
-          ?.toLowerCase()
-          .includes(query) ||
-        enquiry.client_email
-          ?.toLowerCase()
-          .includes(query) ||
-        enquiry.client_company
-          ?.toLowerCase()
-          .includes(query) ||
-        enquiry.project_type
-          ?.toLowerCase()
-          .includes(query);
-
-      const matchesStatus =
-        statusFilter === "ALL" ||
-        enquiry.status ===
-          statusFilter;
-
-      return (
-        matchesSearch &&
-        matchesStatus
-      );
-    });
-
+    return matchesSearch && matchesStatus;
+  });
 
   return (
     <main className="enquiries-page">
-
-      {/* ======================================
-          HEADER
-      ====================================== */}
-
       <div className="enquiries-header">
-
         <div>
-
-          <p className="enquiries-eyebrow">
-            ADMIN / ENQUIRIES
-          </p>
-
+          <p className="enquiries-eyebrow">ADMIN / ENQUIRIES</p>
           <h1>Enquiries</h1>
-
           <p className="enquiries-description">
-            Manage incoming project enquiries
-            and track potential clients.
+            Manage incoming project enquiries and track potential clients.
           </p>
-
         </div>
-
 
         <div className="enquiries-count">
-
-          <span>
-            {enquiries.length}
-          </span>
-
-          <small>
-            Total Enquiries
-          </small>
-
+          <span>{enquiries.length}</span>
+          <small>Total Enquiries</small>
         </div>
-
       </div>
 
-
-      {/* ======================================
-          TOOLBAR
-      ====================================== */}
-
       <div className="enquiries-toolbar">
-
         <input
           type="text"
           placeholder="Search client, email, company or project..."
           value={search}
-          onChange={(event) =>
-            setSearch(
-              event.target.value
-            )
-          }
+          onChange={(e) => setSearch(e.target.value)}
         />
 
-
         <div className="status-filters">
-
-          {statuses.map(
-            (status) => (
-
-              <button
-                key={status}
-                className={
-                  statusFilter === status
-                    ? "active"
-                    : ""
-                }
-                onClick={() =>
-                  setStatusFilter(
-                    status
-                  )
-                }
-              >
-                {status}
-              </button>
-
-            )
-          )}
-
-        </div>
-
-      </div>
-
-
-      {/* ======================================
-          LOADING
-      ====================================== */}
-
-      {loading && (
-        <div className="enquiries-state">
-          Loading enquiries...
-        </div>
-      )}
-
-
-      {/* ======================================
-          ERROR
-      ====================================== */}
-
-      {!loading && error && (
-
-        <div className="enquiries-state enquiries-state--error">
-
-          <p>{error}</p>
-
+          {/* ALL button — was missing before */}
           <button
-            onClick={loadEnquiries}
+            className={statusFilter === "ALL" ? "active" : ""}
+            onClick={() => setStatusFilter("ALL")}
           >
-            Try Again
+            ALL
           </button>
 
+          {STATUSES.map((status) => (
+            <button
+              key={status}
+              className={statusFilter === status ? "active" : ""}
+              onClick={() => setStatusFilter(status)}
+            >
+              {status}
+            </button>
+          ))}
         </div>
+      </div>
 
+      {loading && (
+        <div className="enquiries-state">Loading enquiries...</div>
       )}
 
+      {!loading && error && (
+        <div className="enquiries-state enquiries-state--error">
+          <p>{error}</p>
+          <button onClick={loadEnquiries}>Try Again</button>
+        </div>
+      )}
 
-      {/* ======================================
-          EMPTY
-      ====================================== */}
+      {!loading && !error && filteredEnquiries.length === 0 && (
+        <div className="enquiries-state">
+          {search || statusFilter !== "ALL"
+            ? "No enquiries match your filters."
+            : "No enquiries found."}
+        </div>
+      )}
 
-      {!loading &&
-        !error &&
-        filteredEnquiries.length === 0 && (
+      {!loading && !error && filteredEnquiries.length > 0 && (
+        <div className="enquiries-table-wrapper">
+          <table className="enquiries-table">
+            <thead>
+              <tr>
+                <th>Client</th>
+                <th>Project</th>
+                <th>Budget</th>
+                <th>Status</th>
+                <th>Source</th>
+                <th>Received</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
 
-          <div className="enquiries-state">
+            <tbody>
+              {filteredEnquiries.map((enquiry) => (
+                <tr key={enquiry.id}>
+                  <td>
+                    <div className="enquiry-client-name">
+                      {enquiry.client_name}
+                    </div>
+                    <div className="enquiry-client-email">
+                      {enquiry.client_email}
+                    </div>
+                    {enquiry.client_company && (
+                      <div className="enquiry-client-company">
+                        {enquiry.client_company}
+                      </div>
+                    )}
+                  </td>
 
-            {search ||
-            statusFilter !== "ALL"
-              ? "No enquiries match your filters."
-              : "No enquiries found."}
+                  <td>
+                    <span className="project-type">
+                      {enquiry.project_type}
+                    </span>
+                    <p className="enquiry-message">{enquiry.message}</p>
+                  </td>
 
-          </div>
+                  <td>
+                    {enquiry.budget ? (
+                      <>
+                        {enquiry.currency || "INR"}{" "}
+                        {formatBudget(enquiry.budget)}
+                      </>
+                    ) : (
+                      "—"
+                    )}
+                  </td>
 
-        )}
+                  <td>
+                    <select
+                      value={enquiry.status}
+                      onChange={(e) =>
+                        handleStatusChange(enquiry.id, e.target.value)
+                      }
+                      className={`status-select status-${enquiry.status.toLowerCase()}`}
+                    >
+                      {STATUSES.map((status) => (
+                        <option key={status} value={status}>
+                          {status}
+                        </option>
+                      ))}
+                    </select>
+                  </td>
 
+                  <td>
+                    <span className="source-badge">{enquiry.source}</span>
+                  </td>
 
-      {/* ======================================
-          TABLE
-      ====================================== */}
+                  <td>
+                    {enquiry.created_at
+                      ? new Date(enquiry.created_at).toLocaleDateString()
+                      : "—"}
+                  </td>
 
-      {!loading &&
-        !error &&
-        filteredEnquiries.length > 0 && (
-
-          <div className="enquiries-table-wrapper">
-
-            <table className="enquiries-table">
-
-              <thead>
-
-                <tr>
-                  <th>Client</th>
-                  <th>Project</th>
-                  <th>Budget</th>
-                  <th>Status</th>
-                  <th>Source</th>
-                  <th>Received</th>
-                  <th>Actions</th>
+                  <td>
+                    <button
+                      className="delete-button"
+                      onClick={() => handleDelete(enquiry.id)}
+                    >
+                      Delete
+                    </button>
+                  </td>
                 </tr>
-
-              </thead>
-
-
-              <tbody>
-
-                {filteredEnquiries.map(
-                  (enquiry) => (
-
-                    <tr key={enquiry.id}>
-
-                      {/* CLIENT */}
-
-                      <td>
-
-                        <div className="enquiry-client-name">
-                          {enquiry.client_name}
-                        </div>
-
-                        <div className="enquiry-client-email">
-                          {enquiry.client_email}
-                        </div>
-
-                        {enquiry.client_company && (
-                          <div className="enquiry-client-company">
-                            {enquiry.client_company}
-                          </div>
-                        )}
-
-                      </td>
-
-
-                      {/* PROJECT */}
-
-                      <td>
-
-                        <span className="project-type">
-                          {enquiry.project_type}
-                        </span>
-
-                        <p className="enquiry-message">
-                          {enquiry.message}
-                        </p>
-
-                      </td>
-
-
-                      {/* BUDGET */}
-
-                      <td>
-
-                        {enquiry.budget ? (
-  <>
-    {enquiry.currency || "INR"}{" "}
-    {formatBudget(enquiry.budget)}
-  </>
-) : (
-  "—"
-)}
-
-                      </td>
-
-
-                      {/* STATUS */}
-
-                      <td>
-
-                        <select
-                          value={
-                            enquiry.status
-                          }
-                          onChange={(event) =>
-                            handleStatusChange(
-                              enquiry.id,
-                              event.target.value
-                            )
-                          }
-                          className={`status-select status-${enquiry.status.toLowerCase()}`}
-                        >
-
-                          {statuses
-                            .filter(
-                              (status) =>
-                                status !==
-                                "ALL"
-                            )
-                            .map(
-                              (status) => (
-                                <option
-                                  key={
-                                    status
-                                  }
-                                  value={
-                                    status
-                                  }
-                                >
-                                  {status}
-                                </option>
-                              )
-                            )}
-
-                        </select>
-
-                      </td>
-
-
-                      {/* SOURCE */}
-
-                      <td>
-                        <span className="source-badge">
-                          {enquiry.source}
-                        </span>
-                      </td>
-
-
-                      {/* DATE */}
-
-                      <td>
-
-                        {enquiry.created_at
-                          ? new Date(
-                              enquiry.created_at
-                            ).toLocaleDateString()
-                          : "—"}
-
-                      </td>
-
-
-                      {/* ACTIONS */}
-
-                      <td>
-
-                        <button
-                          className="delete-button"
-                          onClick={() =>
-                            handleDelete(
-                              enquiry.id
-                            )
-                          }
-                        >
-                          Delete
-                        </button>
-
-                      </td>
-
-                    </tr>
-
-                  )
-                )}
-
-              </tbody>
-
-            </table>
-
-          </div>
-
-        )}
-
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </main>
   );
 }

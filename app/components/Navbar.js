@@ -1,55 +1,75 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import Link from "next/link";
 import "../styles/Navbar.css";
 
-const navItems = [
-  { number: "01", label: "home", href: "#top" },
-  { number: "02", label: "expertise", href: "#services" },
-  { number: "03", label: "work", href: "#work" },
-  { number: "04", label: "testimonials", href: "#reviews" },
-  { number: "05", label: "contact", href: "#contact" },
+const NAV_ITEMS = [
+  { label: "About", href: "#about" },
+  { label: "Work", href: "#work" },
+  { label: "Skills", href: "#skills" },
+  { label: "Contact", href: "#contact" },
 ];
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
 
-  function handleNavigation() {
+  useEffect(() => {
+    function handleScroll() {
+      setScrolled(window.scrollY > 20);
+    }
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    handleScroll();
+
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  // Lock body scroll when mobile menu is open
+  useEffect(() => {
+    if (menuOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [menuOpen]);
+
+  function closeMenu() {
     setMenuOpen(false);
   }
 
   return (
-    <header className="navbar">
-      <div className="navbar__container">
-        <a
-          href="#top"
-          className="navbar__logo"
-          onClick={handleNavigation}
+    <header className={`navbar ${scrolled ? "navbar--scrolled" : ""}`}>
+      <div className="container navbar__container">
+        <Link
+          href="/"
+          className="navbar__brand"
+          onClick={closeMenu}
           aria-label="Avinash Vishwakarma home"
         >
-          <span>Avinash</span>
-          <strong>.</strong>
-          <i>_</i>
-        </a>
+          Avinash<span className="navbar__brand-dot">.</span>
+        </Link>
 
-        <nav
-          className={`navbar__links ${
-            menuOpen ? "navbar__links--open" : ""
-          }`}
-        >
-          {navItems.map((item) => (
+        <nav className="navbar__links" aria-label="Main">
+          {NAV_ITEMS.map((item) => (
             <a
               key={item.href}
               href={item.href}
-              onClick={handleNavigation}
+              className="navbar__link"
+              onClick={closeMenu}
             >
-              <small>{item.number}</small>
-
-              <span>
-                <b>//</b> {item.label}
-              </span>
+              {item.label}
             </a>
           ))}
+
+          <a href="#contact" className="navbar__cta" onClick={closeMenu}>
+            Hire me
+          </a>
         </nav>
 
         <button
@@ -57,15 +77,40 @@ export default function Navbar() {
           className={`navbar__toggle ${
             menuOpen ? "navbar__toggle--open" : ""
           }`}
-          onClick={() => setMenuOpen((current) => !current)}
-          aria-label={
-            menuOpen ? "Close navigation" : "Open navigation"
-          }
+          onClick={() => setMenuOpen((v) => !v)}
+          aria-label={menuOpen ? "Close menu" : "Open menu"}
           aria-expanded={menuOpen}
         >
           <span />
           <span />
         </button>
+      </div>
+
+      {/* Mobile drawer */}
+      <div
+        className={`navbar__mobile ${menuOpen ? "navbar__mobile--open" : ""}`}
+        aria-hidden={!menuOpen}
+      >
+        <nav className="navbar__mobile-nav" aria-label="Mobile">
+          {NAV_ITEMS.map((item) => (
+            <a
+              key={item.href}
+              href={item.href}
+              className="navbar__mobile-link"
+              onClick={closeMenu}
+            >
+              {item.label}
+            </a>
+          ))}
+
+          <a
+            href="#contact"
+            className="navbar__mobile-cta"
+            onClick={closeMenu}
+          >
+            Hire me
+          </a>
+        </nav>
       </div>
     </header>
   );

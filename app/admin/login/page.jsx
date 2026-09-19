@@ -1,17 +1,17 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { Suspense, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 
 import { adminLogin } from "../../lib/api";
 import "./login.css";
 
-export default function AdminLogin() {
+function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -22,42 +22,23 @@ export default function AdminLogin() {
     setLoading(true);
 
     try {
-      const response = await adminLogin(
-        email,
-        password
-      );
+      const response = await adminLogin(email, password);
+      const { token, user } = response.data;
 
-      console.log(
-        "LOGIN RESPONSE:",
-        response
-      );
+      localStorage.setItem("admin_token", token);
+      localStorage.setItem("admin_user", JSON.stringify(user));
 
-      const { token, user } =
-        response.data;
+      // Respect the ?next= param set by the layout redirect.
+      // Falls back to dashboard if absent.
+      const next = searchParams.get("next") || "/admin/dashboard";
 
-      localStorage.setItem(
-        "admin_token",
-        token
-      );
+      // Guard against open-redirect: only allow internal paths
+      const safeNext = next.startsWith("/") ? next : "/admin/dashboard";
 
-      localStorage.setItem(
-        "admin_user",
-        JSON.stringify(user)
-      );
-
-      router.push(
-        "/admin/dashboard"
-      );
-    } catch (error) {
-      console.error(
-        "LOGIN ERROR:",
-        error
-      );
-
-      setError(
-        error.message ||
-          "Login failed."
-      );
+      router.replace(safeNext);
+    } catch (err) {
+      console.error("Login failed:", err);
+      setError(err.message || "Login failed.");
     } finally {
       setLoading(false);
     }
@@ -66,99 +47,74 @@ export default function AdminLogin() {
   return (
     <main className="admin-login">
       <div className="admin-login__card">
+        <p className="admin-login__eyebrow">Portfolio Admin</p>
 
-        <p className="admin-login__eyebrow">
-          Portfolio Admin
-        </p>
-
-        <h1 className="admin-login__title">
-          Admin Login
-        </h1>
+        <h1 className="admin-login__title">Admin Login</h1>
 
         <p className="admin-login__subtitle">
-          Sign in to manage your portfolio,
-          projects, enquiries and content.
+          Sign in to manage your portfolio, projects, enquiries and content.
         </p>
 
-        <form
-          className="admin-login__form"
-          onSubmit={handleSubmit}
-        >
-
-          {/* EMAIL */}
-
+        <form className="admin-login__form" onSubmit={handleSubmit}>
           <div className="admin-login__field">
-            <label htmlFor="email">
-              Email
-            </label>
-
+            <label htmlFor="email">Email</label>
             <input
               id="email"
               type="email"
               value={email}
-              onChange={(event) =>
-                setEmail(
-                  event.target.value
-                )
-              }
+              onChange={(e) => setEmail(e.target.value)}
               placeholder="Enter your email"
               autoComplete="email"
               required
             />
           </div>
 
-          {/* PASSWORD */}
-
           <div className="admin-login__field">
-            <label htmlFor="password">
-              Password
-            </label>
-
+            <label htmlFor="password">Password</label>
             <input
               id="password"
               type="password"
               value={password}
-              onChange={(event) =>
-                setPassword(
-                  event.target.value
-                )
-              }
+              onChange={(e) => setPassword(e.target.value)}
               placeholder="Enter your password"
               autoComplete="current-password"
               required
             />
           </div>
 
-          {/* ERROR */}
-
           {error && (
-            <p
-              className="admin-login__error"
-              role="alert"
-            >
+            <p className="admin-login__error" role="alert">
               {error}
             </p>
           )}
-
-          {/* SUBMIT */}
 
           <button
             type="submit"
             className="admin-login__button"
             disabled={loading}
           >
-            {loading
-              ? "Authenticating..."
-              : "Sign In →"}
+            {loading ? "Authenticating..." : "Sign In →"}
           </button>
-
         </form>
 
-        <p className="admin-login__footer">
-          Authorized access only
-        </p>
-
+        <p className="admin-login__footer">Authorized access only</p>
       </div>
     </main>
+  );
+}
+
+export default function AdminLogin() {
+  return (
+    <Suspense
+      fallback={
+        <main className="admin-login">
+          <div className="admin-login__card">
+            <p className="admin-login__subtitle">Loading...</p>
+          </div>
+        </main>
+      }
+    >
+      <LoginForm />
+    </Suspense>
   );
 }

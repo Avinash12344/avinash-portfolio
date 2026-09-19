@@ -4,14 +4,13 @@ import { useEffect, useMemo, useState } from "react";
 import {
   getReviews,
   getClients,
-  getProjects,
+  getProjectsAdmin,
   createReview,
   updateReview,
   updateReviewApproval,
   updateReviewPublishStatus,
   deleteReview,
-} from "@/app/lib/api";
-
+} from "@/lib/api";
 import "./reviews.css";
 
 export default function ReviewsPage() {
@@ -56,40 +55,16 @@ const [form, setForm] = useState({
 
   async function loadFormData() {
   try {
-    const token =
-      localStorage.getItem("admin_token");
-
-    if (!token) {
-      throw new Error(
-        "Authentication required."
-      );
-    }
-
-    const [
-      clientsResponse,
-      projectsResponse,
-    ] = await Promise.all([
-      getClients(token),
-      getProjects(token),
+    const [clientsResponse, projectsResponse] = await Promise.all([
+      getClients(),
+      getProjectsAdmin(),   // ← was getProjects()
     ]);
 
-    setClients(
-      clientsResponse.data || []
-    );
-
-    setProjects(
-      projectsResponse.data || []
-    );
+    setClients(clientsResponse.data || []);
+    setProjects(projectsResponse.data || []);
   } catch (error) {
-    console.error(
-      "Failed to load review form data:",
-      error
-    );
-
-    alert(
-      error.message ||
-        "Failed to load clients and projects."
-    );
+    console.error("Failed to load review form data:", error);
+    alert(error.message || "Failed to load clients and projects.");
   }
 }
 
@@ -154,129 +129,102 @@ function handleFormChange(
   }));
 }
 
-async function handleSaveReview(
-  event
-) {
+async function handleSaveReview(event) {
   event.preventDefault();
 
   try {
     setSaving(true);
 
-    const token =
-      localStorage.getItem("admin_token");
-
-    if (!token) {
-      throw new Error(
-        "Authentication required."
-      );
-    }
-
     if (!form.clientId) {
-      throw new Error(
-        "Please select a client."
-      );
+      throw new Error("Please select a client.");
     }
 
     if (!form.projectId) {
-      throw new Error(
-        "Please select a project."
-      );
+      throw new Error("Please select a project.");
     }
 
-    if (
-      !form.testimonial.trim()
-    ) {
-      throw new Error(
-        "Testimonial is required."
-      );
+    if (!form.testimonial.trim()) {
+      throw new Error("Testimonial is required.");
     }
 
-    if (
-      Number(form.rating) < 1 ||
-      Number(form.rating) > 5
-    ) {
-      throw new Error(
-        "Rating must be between 1 and 5."
-      );
+    if (Number(form.rating) < 1 || Number(form.rating) > 5) {
+      throw new Error("Rating must be between 1 and 5.");
     }
 
-    // ----------------------------------------
-    // PUBLISHED REQUIRES APPROVAL
-    // ----------------------------------------
-
-    if (
-      form.isPublished &&
-      !form.isApproved
-    ) {
-      throw new Error(
-        "A review must be approved before publishing."
-      );
+    if (form.isPublished && !form.isApproved) {
+      throw new Error("A review must be approved before publishing.");
     }
 
+    // Approval + publish are NOT part of create/update payloads.
+    // They're separate endpoints. Send only what the schema accepts.
     const payload = {
       clientId: form.clientId,
       projectId: form.projectId,
       rating: Number(form.rating),
-      testimonial:
-        form.testimonial.trim(),
-      isApproved:
-        form.isApproved,
-      isPublished:
-        form.isPublished,
+      testimonial: form.testimonial.trim(),
     };
 
-    let response;
+    let savedReview;
 
     if (editingReview) {
-      response =
-        await updateReview(
+      const response = await updateReview(editingReview.id, payload);
+      savedReview = response.data;
+
+      // Approval changed? Call the dedicated endpoint.
+      if (form.isApproved !== editingReview.is_approved) {
+        const approvalRes = await updateReviewApproval(
           editingReview.id,
-          payload,
-          token
+          form.isApproved
         );
-    } else {
-      response =
-        await createReview(
-          payload,
-          token
+        savedReview = approvalRes.data;
+      }
+
+      // Publish changed? Same deal.
+      if (form.isPublished !== editingReview.is_published) {
+        const publishRes = await updateReviewPublishStatus(
+          editingReview.id,
+          form.isPublished
         );
-    }
+        savedReview = publishRes.data;
+      }
 
-    const savedReview =
-      response.data;
-
-    if (editingReview) {
       setReviews((current) =>
         current.map((review) =>
-          review.id ===
-          editingReview.id
-            ? {
-                ...review,
-                ...savedReview,
-              }
+          review.id === editingReview.id
+            ? { ...review, ...savedReview }
             : review
         )
       );
     } else {
-      setReviews((current) => [
-        savedReview,
-        ...current,
-      ]);
+      const response = await createReview(payload);
+      savedReview = response.data;
+
+      // New reviews always come back unapproved + unpublished.
+      // Apply the admin's intent immediately.
+      if (form.isApproved) {
+        const approvalRes = await updateReviewApproval(
+          savedReview.id,
+          true
+        );
+        savedReview = approvalRes.data;
+      }
+
+      if (form.isPublished && form.isApproved) {
+        const publishRes = await updateReviewPublishStatus(
+          savedReview.id,
+          true
+        );
+        savedReview = publishRes.data;
+      }
+
+      setReviews((current) => [savedReview, ...current]);
     }
 
     setShowForm(false);
     setEditingReview(null);
-
   } catch (error) {
-    console.error(
-      "Failed to save review:",
-      error
-    );
-
-    alert(
-      error.message ||
-        "Failed to save review."
-    );
+    console.error("Failed to save review:", error);
+    alert(error.message || "Failed to save review.");
   } finally {
     setSaving(false);
   }

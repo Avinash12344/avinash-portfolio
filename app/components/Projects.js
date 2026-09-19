@@ -1,609 +1,403 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
 import "../styles/Projects.css";
 
-const FILTERS = [
-  "All",
-  "Web Development",
-  "Backend",
-  "Shopify",
-];
-
 function getProjectImage(project) {
-  return (
-    project?.image_url ||
-    project?.imageUrl ||
-    project?.image ||
-    project?.thumbnail_url ||
-    project?.thumbnail ||
-    null
-  );
+  return project?.thumbnailUrl || null;
 }
 
-/*
-|--------------------------------------------------------------------------
-| Convert any backend project type into one of our frontend categories
-|--------------------------------------------------------------------------
-*/
-
-function getProjectCategory(project) {
-  const type = String(
-    project?.type || ""
-  )
-    .trim()
-    .toLowerCase();
-
-  const name = String(
-    project?.name || ""
-  )
-    .trim()
-    .toLowerCase();
-
-  const description = String(
-    project?.description || ""
-  )
-    .trim()
-    .toLowerCase();
-
-  const searchableText =
-    `${type} ${name} ${description}`;
-
-  /* Shopify / E-commerce */
-
-  if (
-    searchableText.includes("shopify") ||
-    searchableText.includes("ecommerce") ||
-    searchableText.includes("e-commerce") ||
-    searchableText.includes("online store") ||
-    searchableText.includes("storefront")
-  ) {
-    return "Shopify";
+function getProjectLink(project) {
+  if (project.source === "portfolio" && project.slug) {
+    return { type: "internal", href: `/work/${project.slug}` };
   }
-
-  /* Backend */
-
-  if (
-    searchableText.includes("backend") ||
-    searchableText.includes("back-end") ||
-    searchableText.includes("api") ||
-    searchableText.includes("node.js") ||
-    searchableText.includes("nodejs") ||
-    searchableText.includes("express") ||
-    searchableText.includes("postgresql") ||
-    searchableText.includes("database")
-  ) {
-    return "Backend";
+  if (project.liveUrl) {
+    return { type: "external", href: project.liveUrl };
   }
-
-  /* Web Development */
-
-  if (
-    searchableText.includes("web") ||
-    searchableText.includes("website") ||
-    searchableText.includes("frontend") ||
-    searchableText.includes("front-end") ||
-    searchableText.includes("react") ||
-    searchableText.includes("next.js") ||
-    searchableText.includes("nextjs") ||
-    searchableText.includes("javascript")
-  ) {
-    return "Web Development";
+  if (project.githubUrl) {
+    return { type: "external", href: project.githubUrl };
   }
-
-  /*
-  |--------------------------------------------------------------------------
-  | Fallback based on the original backend type
-  |--------------------------------------------------------------------------
-  */
-
-  if (
-    type.includes("shop")
-  ) {
-    return "Shopify";
-  }
-
-  if (
-    type.includes("back")
-  ) {
-    return "Backend";
-  }
-
-  if (
-    type.includes("web") ||
-    type.includes("front")
-  ) {
-    return "Web Development";
-  }
-
-  return "Web Development";
+  return null;
 }
 
-function getProjectNumber(index) {
-  return String(index + 1).padStart(2, "0");
-}
+export default function Projects({ work }) {
+  const workList = Array.isArray(work) ? work : [];
 
-export default function Projects({ projects }) {
-  const projectList = Array.isArray(projects)
-    ? projects
-    : [];
+  const [activeCategory, setActiveCategory] = useState("All");
+  const [activeTechs, setActiveTechs] = useState([]);
 
-  const [activeFilter, setActiveFilter] =
-    useState("All");
+  /* ----------------------------------------
+     DERIVED DATA
+     ---------------------------------------- */
 
-  /*
-  |--------------------------------------------------------------------------
-  | Featured project
-  |--------------------------------------------------------------------------
-  */
-
-  const featuredProject =
-    projectList.length > 0
-      ? projectList[0]
-      : null;
-
-  /*
-  |--------------------------------------------------------------------------
-  | Filter projects
-  |--------------------------------------------------------------------------
-  */
-
-  const filteredProjects = useMemo(() => {
-    if (activeFilter === "All") {
-      return projectList;
-    }
-
-    return projectList.filter(
-      (project) =>
-        getProjectCategory(project) ===
-        activeFilter
-    );
-  }, [projectList, activeFilter]);
-
-  /*
-  |--------------------------------------------------------------------------
-  | Cards below featured project
-  |--------------------------------------------------------------------------
-  */
-
-  const gridProjects = useMemo(() => {
-    return filteredProjects.filter(
-      (project) =>
-        project?.id !==
-        featuredProject?.id
-    );
-  }, [
-    filteredProjects,
-    featuredProject,
-  ]);
-
-  /*
-  |--------------------------------------------------------------------------
-  | Filter counts
-  |--------------------------------------------------------------------------
-  */
-
-  const filterCounts = useMemo(() => {
-    const counts = {
-      All: projectList.length,
-      "Web Development": 0,
-      Backend: 0,
-      Shopify: 0,
-    };
-
-    projectList.forEach((project) => {
-      const category =
-        getProjectCategory(project);
-
-      if (counts[category] !== undefined) {
-        counts[category] += 1;
-      }
+  const categories = useMemo(() => {
+    const set = new Set();
+    workList.forEach((p) => {
+      if (p.category) set.add(p.category);
     });
+    return ["All", ...Array.from(set).sort()];
+  }, [workList]);
 
-    return counts;
-  }, [projectList]);
+  const techOptions = useMemo(() => {
+    const counts = new Map();
+    workList.forEach((p) => {
+      (p.techStack || []).forEach((tech) => {
+        counts.set(tech, (counts.get(tech) || 0) + 1);
+      });
+    });
+    return Array.from(counts.entries())
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 12)
+      .map(([tech]) => tech);
+  }, [workList]);
+
+  const featuredProject = useMemo(() => {
+    if (workList.length === 0) return null;
+    return workList.find((p) => p.isFeatured) || workList[0];
+  }, [workList]);
+
+  const filteredWork = useMemo(() => {
+    return workList.filter((p) => {
+      const matchesCategory =
+        activeCategory === "All" || p.category === activeCategory;
+      const matchesTech =
+        activeTechs.length === 0 ||
+        activeTechs.every((tech) => (p.techStack || []).includes(tech));
+      return matchesCategory && matchesTech;
+    });
+  }, [workList, activeCategory, activeTechs]);
+
+  const showFeatured =
+    activeCategory === "All" && activeTechs.length === 0 && featuredProject;
+
+  const gridItems = showFeatured
+    ? filteredWork.filter((p) => p.id !== featuredProject.id)
+    : filteredWork;
+
+  /* ----------------------------------------
+     EARLY RETURN
+     ---------------------------------------- */
+
+  if (workList.length === 0) return null;
+
+  /* ----------------------------------------
+     HANDLERS
+     ---------------------------------------- */
+
+  function toggleTech(tech) {
+    setActiveTechs((current) =>
+      current.includes(tech)
+        ? current.filter((t) => t !== tech)
+        : [...current, tech]
+    );
+  }
+
+  function clearTechs() {
+    setActiveTechs([]);
+  }
 
   return (
-    <section
-      id="work"
-      className="projects"
-      aria-labelledby="projects-title"
-    >
-      <div className="container">
+    <section id="work" className="work" aria-labelledby="work-title">
+      <div className="container work__container">
+        {/* ----------------------------------------
+            LABEL
+            ---------------------------------------- */}
 
-        {/* =================================================
+        <p className="work__label">Work</p>
+
+        {/* ----------------------------------------
             HEADER
-            ================================================= */}
+            ---------------------------------------- */}
 
-        <div className="projects__header">
+        <div className="work__top">
+          <h2 id="work-title" className="work__heading">
+            Selected <em>work.</em>
+          </h2>
 
-          <div className="projects__title">
-            <p className="eyebrow">
-              03. My Work
-            </p>
-
-            <h2 id="projects-title">
-              My
-              <br />
-              <span>Work.</span>
-            </h2>
-          </div>
-
-          <div className="projects__intro">
-            <p>
-              A selection of applications,
-              websites and systems I've built
-              to solve practical business and
-              technical problems.
-            </p>
-
-            <span className="projects__intro-line">
-              SELECTED PROJECTS
-            </span>
-          </div>
-
+          <p className="work__aside">
+            Personal projects and client work — everything I&rsquo;ve
+            shipped, big and small.
+          </p>
         </div>
 
-        {/* =================================================
-            FEATURED PROJECT
-            ================================================= */}
+        {/* ----------------------------------------
+            FEATURED
+            ---------------------------------------- */}
 
-        {featuredProject && (
-          <article className="projects__featured">
+        {showFeatured && <FeaturedProject project={featuredProject} />}
 
-            <div className="projects__featured-visual">
-
-              {getProjectImage(
-                featuredProject
-              ) ? (
-                <img
-                  src={getProjectImage(
-                    featuredProject
-                  )}
-                  alt={
-                    featuredProject.name ||
-                    "Featured project"
-                  }
-                />
-              ) : (
-                <div
-                  className="project-visual project-visual--featured"
-                  aria-hidden="true"
-                >
-                  <span>
-                    FEATURED
-                  </span>
-
-                  <strong>
-                    01
-                  </strong>
-
-                  <div className="project-visual__grid" />
-                </div>
-              )}
-
-              <div className="projects__featured-label">
-                <span>
-                  Featured Project
-                </span>
-
-                <span>
-                  01
-                </span>
-              </div>
-
-            </div>
-
-            <div className="projects__featured-info">
-
-              <p className="projects__project-type">
-                {getProjectCategory(
-                  featuredProject
-                )}
-              </p>
-
-              <h3>
-                {featuredProject.name}
-              </h3>
-
-              {featuredProject.description && (
-                <p className="projects__featured-description">
-                  {featuredProject.description}
-                </p>
-              )}
-
-              <div className="projects__featured-meta">
-
-                {featuredProject.status && (
-                  <span>
-                    {featuredProject.status.replace(
-                      /_/g,
-                      " "
-                    )}
-                  </span>
-                )}
-
-                <span>
-                  PROJECT 01
-                </span>
-
-              </div>
-
-              <div className="projects__featured-actions">
-
-                {featuredProject.live_url && (
-                  <a
-                    href={
-                      featuredProject.live_url
-                    }
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    View Project
-                    <span>↗</span>
-                  </a>
-                )}
-
-                {featuredProject.github_url && (
-                  <a
-                    href={
-                      featuredProject.github_url
-                    }
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    GitHub
-                    <span>↗</span>
-                  </a>
-                )}
-
-              </div>
-
-            </div>
-
-          </article>
-        )}
-
-        {/* =================================================
+        {/* ----------------------------------------
             FILTERS
-            ================================================= */}
+            ---------------------------------------- */}
 
-        <div className="projects__filter-row">
+        {(categories.length > 1 || techOptions.length > 0) && (
+          <div className="work__filters">
+            {categories.length > 1 && (
+              <div className="work__filter-row">
+                <span className="work__filter-label">Filter</span>
 
-          <div className="projects__filter-label">
-            <span>
-              Filter by
-            </span>
-          </div>
+                <div className="work__filter-chips">
+                  {categories.map((cat) => {
+                    const isActive = activeCategory === cat;
+                    const count =
+                      cat === "All"
+                        ? workList.length
+                        : workList.filter((p) => p.category === cat).length;
 
-          <div className="projects__filters">
-
-            {FILTERS.map((filter) => {
-
-              const count =
-                filterCounts[filter] || 0;
-
-              return (
-                <button
-                  type="button"
-                  key={filter}
-                  className={
-                    activeFilter === filter
-                      ? "projects__filter projects__filter--active"
-                      : "projects__filter"
-                  }
-                  onClick={() =>
-                    setActiveFilter(filter)
-                  }
-                  aria-pressed={
-                    activeFilter === filter
-                  }
-                >
-                  <span>
-                    {filter}
-                  </span>
-
-                  <small>
-                    {String(count).padStart(
-                      2,
-                      "0"
-                    )}
-                  </small>
-                </button>
-              );
-            })}
-
-          </div>
-
-        </div>
-
-        {/* =================================================
-            PROJECT GRID
-            ================================================= */}
-
-        {gridProjects.length === 0 ? (
-
-          <div className="projects__state">
-            {activeFilter === "All"
-              ? "No additional projects available."
-              : `No ${activeFilter} projects available.`}
-          </div>
-
-        ) : (
-
-          <div className="projects__grid">
-
-            {gridProjects.map(
-              (project, index) => {
-
-                const image =
-                  getProjectImage(
-                    project
-                  );
-
-                return (
-                  <article
-                    className="project-card"
-                    key={
-                      project.id ||
-                      `${project.name}-${index}`
-                    }
-                  >
-
-                    {/* Project visual */}
-
-                    <a
-                      className="project-card__visual"
-                      href={
-                        project.live_url ||
-                        project.github_url ||
-                        "#"
-                      }
-                      target={
-                        project.live_url ||
-                        project.github_url
-                          ? "_blank"
-                          : undefined
-                      }
-                      rel={
-                        project.live_url ||
-                        project.github_url
-                          ? "noopener noreferrer"
-                          : undefined
-                      }
-                      aria-label={`View ${project.name}`}
-                    >
-
-                      {image ? (
-                        <img
-                          src={image}
-                          alt={
-                            project.name
-                          }
-                        />
-                      ) : (
-                        <div
-                          className={`project-visual project-visual--${
-                            (index % 3) + 1
-                          }`}
-                          aria-hidden="true"
-                        >
-
-                          <span>
-                            PROJECT
-                          </span>
-
-                          <strong>
-                            {String(
-                              index + 2
-                            ).padStart(
-                              2,
-                              "0"
-                            )}
-                          </strong>
-
-                          <div className="project-visual__grid" />
-
-                        </div>
-                      )}
-
-                      <div className="project-card__overlay">
-
-                        <span>
-                          Show Project
-                        </span>
-
-                        <strong>
-                          ↗
-                        </strong>
-
-                      </div>
-
-                    </a>
-
-                    {/* Project information */}
-
-                    <div className="project-card__content">
-
-                      <div className="project-card__top">
-
-                        <span className="project-card__number">
-                          {getProjectNumber(
-                            index + 1
-                          )}
-                        </span>
-
-                        <span className="project-card__type">
-                          {getProjectCategory(
-                            project
-                          )}
-                        </span>
-
-                      </div>
-
-                      <h3>
-                        {project.name}
-                      </h3>
-
-                      {project.description && (
-                        <p>
-                          {project.description}
-                        </p>
-                      )}
-
-                      <div className="project-card__bottom">
-
-                        {project.status && (
-                          <span>
-                            {project.status.replace(
-                              /_/g,
-                              " "
-                            )}
-                          </span>
-                        )}
-
-                        <div>
-
-                          {project.github_url && (
-                            <a
-                              href={
-                                project.github_url
-                              }
-                              target="_blank"
-                              rel="noopener noreferrer"
-                            >
-                              GitHub ↗
-                            </a>
-                          )}
-
-                          {project.live_url && (
-                            <a
-                              href={
-                                project.live_url
-                              }
-                              target="_blank"
-                              rel="noopener noreferrer"
-                            >
-                              Live ↗
-                            </a>
-                          )}
-
-                        </div>
-
-                      </div>
-
-                    </div>
-
-                  </article>
-                );
-              }
+                    return (
+                      <button
+                        type="button"
+                        key={cat}
+                        className={
+                          isActive
+                            ? "work__chip work__chip--active"
+                            : "work__chip"
+                        }
+                        onClick={() => setActiveCategory(cat)}
+                        aria-pressed={isActive}
+                      >
+                        {cat}
+                        <small>{String(count).padStart(2, "0")}</small>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
             )}
 
-          </div>
+            {techOptions.length > 0 && (
+              <div className="work__filter-row">
+                <span className="work__filter-label">Stack</span>
 
+                <div className="work__filter-chips">
+                  {techOptions.map((tech) => {
+                    const isActive = activeTechs.includes(tech);
+                    return (
+                      <button
+                        type="button"
+                        key={tech}
+                        className={
+                          isActive
+                            ? "work__chip work__chip--tech-active"
+                            : "work__chip work__chip--tech"
+                        }
+                        onClick={() => toggleTech(tech)}
+                        aria-pressed={isActive}
+                      >
+                        {tech}
+                      </button>
+                    );
+                  })}
+
+                  {activeTechs.length > 0 && (
+                    <button
+                      type="button"
+                      className="work__chip-clear"
+                      onClick={clearTechs}
+                    >
+                      Clear
+                    </button>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
         )}
 
+        {/* ----------------------------------------
+            GRID
+            ---------------------------------------- */}
+
+        {gridItems.length === 0 ? (
+          <div className="work__empty">
+            <p>No projects match the current filters.</p>
+          </div>
+        ) : (
+          <div className="work__grid">
+            {gridItems.map((project, index) => (
+              <ProjectTile
+                key={project.id}
+                project={project}
+                index={index}
+              />
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );
+}
+
+/* ========================================
+   FEATURED PROJECT
+   ======================================== */
+
+function FeaturedProject({ project }) {
+  const image = getProjectImage(project);
+  const link = getProjectLink(project);
+
+  const content = (
+    <>
+      <div className="featured-project__visual">
+        {image ? (
+          <Image
+            src={image}
+            alt={project.name}
+            fill
+            sizes="(max-width: 900px) 100vw, 55vw"
+            style={{ objectFit: "cover" }}
+          />
+        ) : (
+          <div className="featured-project__placeholder" aria-hidden="true">
+            <span>Featured</span>
+          </div>
+        )}
+      </div>
+
+      <div className="featured-project__info">
+        <div className="featured-project__badges">
+          <span className="featured-project__badge featured-project__badge--accent">
+            Featured
+          </span>
+
+          <span className="featured-project__badge">
+            {project.source === "portfolio" ? "Personal" : "Client"}
+          </span>
+        </div>
+
+        <h3 className="featured-project__title">{project.name}</h3>
+
+        {(project.tagline || project.description) && (
+          <p className="featured-project__tagline">
+            {project.tagline || project.description}
+          </p>
+        )}
+
+        {project.techStack?.length > 0 && (
+          <div className="featured-project__stack">
+            {project.techStack.slice(0, 6).map((tech) => (
+              <span key={tech}>{tech}</span>
+            ))}
+          </div>
+        )}
+
+        {link && (
+          <span className="featured-project__cta">
+            {link.type === "internal" ? "View case study" : "View project"}
+            <span className="featured-project__cta-arrow" aria-hidden="true">
+              →
+            </span>
+          </span>
+        )}
+      </div>
+    </>
+  );
+
+  const className = "featured-project";
+
+  if (link?.type === "internal") {
+    return (
+      <Link href={link.href} className={className}>
+        {content}
+      </Link>
+    );
+  }
+
+  if (link?.type === "external") {
+    return (
+      <a
+        href={link.href}
+        target="_blank"
+        rel="noopener noreferrer"
+        className={className}
+      >
+        {content}
+      </a>
+    );
+  }
+
+  return <article className={className}>{content}</article>;
+}
+
+/* ========================================
+   PROJECT TILE
+   ======================================== */
+
+function ProjectTile({ project, index }) {
+  const image = getProjectImage(project);
+  const link = getProjectLink(project);
+
+  const content = (
+    <>
+      <div className="project-tile__visual">
+        {image ? (
+          <Image
+            src={image}
+            alt={project.name}
+            fill
+            sizes="(max-width: 900px) 100vw, 50vw"
+            style={{ objectFit: "cover" }}
+          />
+        ) : (
+          <div className="project-tile__placeholder" aria-hidden="true">
+            <span>{String(index + 1).padStart(2, "0")}</span>
+          </div>
+        )}
+      </div>
+
+      <div className="project-tile__info">
+        <span className="project-tile__category">{project.category}</span>
+
+        <h3 className="project-tile__title">{project.name}</h3>
+
+        {project.tagline && (
+          <p className="project-tile__tagline">{project.tagline}</p>
+        )}
+
+        {project.techStack?.length > 0 && (
+          <div className="project-tile__stack">
+            {project.techStack.slice(0, 4).map((tech) => (
+              <span key={tech}>{tech}</span>
+            ))}
+          </div>
+        )}
+
+        {link && (
+          <span className="project-tile__cta">
+            {link.type === "internal" ? "Case study" : "View"}
+            <span className="project-tile__cta-arrow" aria-hidden="true">
+              →
+            </span>
+          </span>
+        )}
+      </div>
+    </>
+  );
+
+  const className = "project-tile";
+
+  if (link?.type === "internal") {
+    return (
+      <Link href={link.href} className={className}>
+        {content}
+      </Link>
+    );
+  }
+
+  if (link?.type === "external") {
+    return (
+      <a
+        href={link.href}
+        target="_blank"
+        rel="noopener noreferrer"
+        className={className}
+      >
+        {content}
+      </a>
+    );
+  }
+
+  return <article className={className}>{content}</article>;
 }
