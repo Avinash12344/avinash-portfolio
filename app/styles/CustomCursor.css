@@ -1,0 +1,98 @@
+.custom-cursor {
+  position: fixed;
+  inset: 0;
+
+  z-index: 9999;
+
+  pointer-events: none;
+}
+
+.custom-cursor__dot {
+  position: fixed;
+
+  top: 0;
+  left: 0;
+
+  width: 6px;
+  height: 6px;
+
+  margin-left: -3px;
+  margin-top: -3px;
+
+  border-radius: 50%;
+
+  background: #63d8ed;
+
+  box-shadow:
+    0 0 10px rgba(99, 216, 237, 0.7);
+
+  pointer-events: none;
+}
+
+.custom-cursor__follower {
+  position: fixed;
+
+  top: 0;
+  left: 0;
+
+  width: 36px;
+  height: 36px;
+
+  margin-left: -18px;
+  margin-top: -18px;
+
+  border: 1px solid rgba(99, 216, 237, 0.65);
+
+  border-radius: 50%;
+
+  background: rgba(99, 216, 237, 0.015);
+
+  transition:
+    width 220ms ease,
+    height 220ms ease,
+    margin 220ms ease,
+    border-color 220ms ease,
+    background 220ms ease;
+
+  pointer-events: none;
+}
+
+.custom-cursor__follower::after {
+  content: "";
+
+  position: absolute;
+
+  top: 50%;
+  left: 50%;
+
+  width: 3px;
+  height: 3px;
+
+  transform: translate(-50%, -50%);
+
+  border-radius: 50%;
+
+  background: #bd70ff;
+
+  opacity: 0.8;
+}
+
+.custom-cursor__follower--active {
+  width: 52px;
+  height: 52px;
+
+  margin-left: -26px;
+  margin-top: -26px;
+
+  border-color: rgba(189, 112, 255, 0.7);
+
+  background: rgba(189, 112, 255, 0.035);
+}
+
+/* Don't replace the real cursor on touch devices */
+
+@media (hover: none), (pointer: coarse) {
+  .custom-cursor {
+    display: none;
+  }
+}

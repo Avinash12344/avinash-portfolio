@@ -1,8 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import "../styles/About.css";
-import { getProfile } from "../lib/api";
 
 const highlights = [
   "Modern web application development",
@@ -13,34 +11,7 @@ const highlights = [
   "API integration & debugging",
 ];
 
-export default function About() {
-  const [profile, setProfile] = useState(null);
-
-  useEffect(() => {
-    let mounted = true;
-
-    async function loadProfile() {
-      try {
-        const response = await getProfile();
-
-        if (mounted) {
-          setProfile(response?.data || null);
-        }
-      } catch (error) {
-        console.error(
-          "Failed to load profile:",
-          error
-        );
-      }
-    }
-
-    loadProfile();
-
-    return () => {
-      mounted = false;
-    };
-  }, []);
-
+export default function About({ profile }) {
   const aboutParagraphs = profile?.about
     ? profile.about
         .split("\n")
@@ -55,121 +26,120 @@ export default function About() {
       aria-labelledby="about-title"
     >
       <div className="container">
+        <div className="about__top">
+          <p className="eyebrow">01. About Me</p>
+    
+          <span className="about__top-label">
+            DEVELOPER / BUILDER
+          </span>
+        </div>
 
-        <p className="eyebrow">
-          01. About Me
-        </p>
+        <div className="about__heading">
+          <h2 id="about-title">
+            Building useful
+            <br />
+            <span>things with code.</span>
+          </h2>
+
+          <div className="about__number">
+            <span>01</span>
+            <span>ABOUT</span>
+          </div>
+        </div>
 
         <div className="about__grid">
-
-          {/* ================================
-              ABOUT CONTENT
-          ================================= */}
-
           <div className="about__content">
-
-            <h2
-              id="about-title"
-              className="section-title"
-            >
-              Building useful things with{" "}
-              <span>code.</span>
-            </h2>
-
             {aboutParagraphs.length > 0 ? (
-              aboutParagraphs.map(
-                (paragraph, index) => (
-                  <p key={index}>
-                    {paragraph}
-                  </p>
-                )
-              )
+              aboutParagraphs.map((paragraph, index) => (
+                <p key={index}>{paragraph}</p>
+              ))
             ) : (
               <>
                 <p>
-                  I'm Avinash Vishwakarma, a
-                  software developer focused on
-                  building modern web applications,
-                  APIs, and backend systems.
+                  I'm Avinash Vishwakarma, a software
+                  developer focused on building modern web
+                  applications, APIs, and backend systems.
                 </p>
 
                 <p>
                   I enjoy taking an idea or business
-                  requirement and turning it into a
-                  clean, functional, and maintainable
-                  product.
+                  requirement and turning it into a clean,
+                  functional, and maintainable product.
                 </p>
 
                 <p>
-                  My experience includes React,
-                  JavaScript, Node.js, databases,
-                  APIs, and Shopify development.
+                  My experience includes React, JavaScript,
+                  Node.js, databases, APIs, and Shopify
+                  development.
                 </p>
               </>
             )}
 
-            {profile?.location && (
-              <p className="about__meta">
-                <strong>Location:</strong>{" "}
-                {profile.location}
-              </p>
-            )}
+            <div className="about__meta">
+              {profile?.location && (
+                <div>
+                  <span>LOCATION</span>
+                  <strong>{profile.location}</strong>
+                </div>
+              )}
 
-            {profile?.availability !== undefined && (
-              <p className="about__meta">
-                <strong>Availability:</strong>{" "}
-                <span
-                  className={
-                    profile.availability
-                      ? "availability available"
-                      : "availability unavailable"
-                  }
-                >
-                  {profile.availability
-                    ? "Available for new projects"
-                    : "Currently unavailable"}
-                </span>
-              </p>
-            )}
+              {profile?.availability !== undefined && (
+                <div>
+                  <span>STATUS</span>
 
+                  <strong
+                    className={
+                      profile.availability
+                        ? "availability available"
+                        : "availability unavailable"
+                    }
+                  >
+                    <i aria-hidden="true" />
+                    {profile.availability
+                      ? "Available for new projects"
+                      : "Currently unavailable"}
+                  </strong>
+                </div>
+              )}
+            </div>
           </div>
-
-
-          {/* ================================
-              HIGHLIGHTS
-          ================================= */}
 
           <aside
             className="about__highlights"
             aria-labelledby="about-highlights-title"
           >
-            <p
-              id="about-highlights-title"
-              className="about__label"
-            >
-              What I can help with
-            </p>
+            <div className="about__highlights-header">
+              <span>02</span>
+
+              <p id="about-highlights-title">
+                WHAT I CAN HELP WITH
+              </p>
+            </div>
 
             <ul>
-              {highlights.map(
-                (highlight) => (
-                  <li key={highlight}>
-                    <span
-                      aria-hidden="true"
-                    >
-                      ▹
-                    </span>
+              {highlights.map((highlight, index) => (
+                <li key={highlight}>
+                  <span className="about__highlight-number">
+                    {String(index + 1).padStart(2, "0")}
+                  </span>
 
-                    <span>
-                      {highlight}
-                    </span>
-                  </li>
-                )
-              )}
+                  <span className="about__highlight-text">
+                    {highlight}
+                  </span>
+
+                  <span
+                    className="about__highlight-arrow"
+                    aria-hidden="true"
+                  >
+                    ↗
+                  </span>
+                </li>
+              ))}
             </ul>
           </aside>
-
         </div>
+
+        
       </div>
     </section>
   );

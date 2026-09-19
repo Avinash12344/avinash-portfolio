@@ -3,7 +3,7 @@
      COLORS
   ========================================= */
 
-  --bg-primary: #080808;
+  --bg-primary: #18181b;
   --bg-secondary: #0d0d0d;
   --bg-card: #101010;
 
@@ -11,7 +11,7 @@
   --text-secondary: #999999;
   --text-muted: #666666;
 
-  --accent: #64ffda;
+  --accent: #63d8ed;
 
   --border: rgba(255, 255, 255, 0.1);
   --border-strong: rgba(255, 255, 255, 0.2);

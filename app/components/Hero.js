@@ -1,108 +1,111 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import "../styles/Hero.css";
-import { getProfile } from "../lib/api";
 
-export default function Hero() {
-  const [profile, setProfile] = useState(null);
-  const [error, setError] = useState("");
-
-  useEffect(() => {
-    async function loadProfile() {
-      try {
-        const response = await getProfile();
-        setProfile(response?.data || null);
-      } catch (error) {
-        console.error("Failed to load profile:", error);
-        setError("Unable to load profile.");
-      }
-    }
-
-    loadProfile();
-  }, []);
-
+export default function Hero({ profile }) {
   const name =
-    profile?.name ||
-    "Avinash Vishwakarma";
+    profile?.name || "Avinash Vishwakarma";
 
   const headline =
     profile?.headline ||
-    "I build web applications & backend systems.";
+    "Full Stack Developer & Backend Engineer";
 
-  const description =
-    profile?.short_description ||
-    "I'm a developer focused on building modern web applications, reliable APIs, and scalable backend systems that solve real business problems.";
+  const isAvailable =
+    profile?.availability !== false;
 
   return (
-    <section className="hero">
-      <div className="container hero__container">
-        <div className="hero__content">
-          <p className="hero__eyebrow">
-            Hi, my name is
-          </p>
+    <section
+      id="top"
+      className="hero"
+      aria-labelledby="hero-title"
+    >
+      {/* Background atmosphere */}
+      <div className="hero__background" aria-hidden="true">
+        <div className="hero__orb hero__orb--one" />
+        <div className="hero__orb hero__orb--two" />
 
-          <h1 className="hero__title">
-            {name}.
-          </h1>
+        <div className="hero__cube hero__cube--one" />
+        <div className="hero__cube hero__cube--two" />
+        <div className="hero__cube hero__cube--three" />
+        <div className="hero__cube hero__cube--four" />
 
-          <h2 className="hero__subtitle">
-            {headline}
-          </h2>
+        <div className="hero__glow" />
+      </div>
 
-          <p className="hero__description">
-            {description}
-          </p>
+      <div className="hero__content">
+        <div className="hero__availability">
+          <span
+            className="hero__availability-dot"
+            aria-hidden="true"
+          />
 
-          <div className="hero__actions">
-            <a
-              href="#contact"
-              className="hero__button hero__button--primary"
-            >
-              Hire Me
-            </a>
+          {isAvailable
+            ? "Available for freelance work"
+            : "Currently unavailable"}
+        </div>
 
-            <a
-              href="#work"
-              className="hero__button hero__button--secondary"
-            >
-              View My Work
-            </a>
+        <p className="hero__eyebrow">
+          Full Stack Developer
+        </p>
+
+        <h1
+          id="hero-title"
+          className="hero__title"
+        >
+          {name}
+        </h1>
+
+        <p className="hero__role">
+          {headline}
+        </p>
+
+        <div className="hero__featured">
+          <span className="hero__featured-label">
+            AVAILABLE FOR
+          </span>
+
+          <div className="hero__featured-items">
+            <span>WEB DEVELOPMENT</span>
+            <span>BACKEND SYSTEMS</span>
+            <span>SHOPIFY</span>
+            <span>BUG FIXING</span>
           </div>
-
-          <div className="hero__socials">
-            <a
-              href="https://github.com/Avinash12344"
-              target="_blank"
-              rel="noreferrer"
-            >
-              GitHub
-            </a>
-
-            <a
-              href="https://www.linkedin.com/in/avinash-vishwakarma-2b0a1b1b6/"
-              target="_blank"
-              rel="noreferrer"
-            >
-              LinkedIn
-            </a>
-          </div>
-
-          {error && (
-            <p className="hero__error">
-              {error}
-            </p>
-          )}
         </div>
       </div>
 
-      <a
-        href="#about"
-        className="hero__scroll"
-      >
-        <span>Scroll to explore</span>
-        <span className="hero__scroll-line" />
-      </a>
+      <div className="hero__bottom">
+        <div className="hero__socials">
+          <a
+            href="https://github.com/Avinash12344"
+            target="_blank"
+            rel="noreferrer"
+          >
+            GitHub
+          </a>
+
+          <a
+            href="https://www.linkedin.com/in/avinash-vishwakarma-59b7a71b3"
+            target="_blank"
+            rel="noreferrer"
+          >
+            LinkedIn
+          </a>
+        </div>
+
+        <a
+          href="#services"
+          className="hero__scroll"
+          aria-label="Scroll to expertise"
+        >
+          <span className="hero__scroll-mouse">
+            <span />
+          </span>
+        </a>
+
+        <span className="hero__section-number">
+          01
+        </span>
+      </div>
     </section>
   );
 }

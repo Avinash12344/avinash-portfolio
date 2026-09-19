@@ -58,7 +58,28 @@ async function request(endpoint, options = {}) {
 // ============================================
 
 export async function getPortfolio() {
-  return request("/portfolio");
+  const response = await fetch(`${API_BASE_URL}/portfolio`, {
+    next: {
+      revalidate: 60,
+    },
+  });
+
+  let data = null;
+
+  try {
+    data = await response.json();
+  } catch {
+    data = null;
+  }
+
+  if (!response.ok) {
+    throw new Error(
+      data?.message ||
+        "Failed to load portfolio data."
+    );
+  }
+
+  return data;
 }
 
 

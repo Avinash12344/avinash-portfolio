@@ -1,7 +1,9 @@
 "use client";
 
 import { useState } from "react";
+
 import "../styles/Contact.css";
+
 import { createEnquiry } from "../lib/api";
 
 const INITIAL_FORM = {
@@ -60,6 +62,10 @@ export default function Contact() {
     const message =
       form.message.trim();
 
+    /* =================================================
+       VALIDATION
+       ================================================= */
+
     if (!name) {
       setError(
         "Please enter your name."
@@ -74,7 +80,11 @@ export default function Contact() {
       return;
     }
 
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    if (
+      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
+        email
+      )
+    ) {
       setError(
         "Please enter a valid email address."
       );
@@ -95,14 +105,20 @@ export default function Contact() {
       return;
     }
 
+    /* =================================================
+       SUBMIT
+       ================================================= */
+
     try {
       setLoading(true);
 
       await createEnquiry({
         name,
         email,
-        projectType: form.projectType,
-        budget: form.budget || null,
+        projectType:
+          form.projectType,
+        budget:
+          form.budget || null,
         message,
       });
 
@@ -118,7 +134,7 @@ export default function Contact() {
       );
 
       setError(
-        error.message ||
+        error?.message ||
           "Unable to send your enquiry. Please try again."
       );
     } finally {
@@ -134,15 +150,27 @@ export default function Contact() {
     >
       <div className="container">
 
-        <p className="eyebrow">
-          07. Contact
-        </p>
+        {/* =================================================
+            HEADER
+            ================================================= */}
+
+        <div className="contact__header">
+
+          <p className="eyebrow">
+            05. Contact
+          </p>
+
+          <span className="contact__header-mark">
+            LET'S TALK
+          </span>
+
+        </div>
 
         <div className="contact__grid">
 
-          {/* ====================================
+          {/* =================================================
               CONTENT
-          ==================================== */}
+              ================================================= */}
 
           <div className="contact__content">
 
@@ -150,20 +178,33 @@ export default function Contact() {
               id="contact-title"
               className="section-title"
             >
-              Let's build something{" "}
-              <span>together.</span>
+              Let's build
+              <br />
+              something{" "}
+              <span>
+                together.
+              </span>
             </h2>
 
             <p>
-              Have a project, idea, or technical
-              problem you'd like help with? Tell me
-              a little about it and I'll get back to
-              you.
+              Have a project, idea, or
+              technical problem you'd
+              like help with?
             </p>
+
+            <p>
+              Tell me what you're trying
+              to build and I'll get back
+              to you with the next steps.
+            </p>
+
+            {/* CONTACT DETAILS */}
 
             <div className="contact__details">
 
-              <a href="mailto:your-email@example.com">
+              <a
+                href="mailto:avinashvishwakarmawork@gmail.com"
+              >
                 avinashvishwakarmawork@gmail.com
               </a>
 
@@ -172,7 +213,8 @@ export default function Contact() {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                GitHub ↗
+                GitHub
+                <span>↗</span>
               </a>
 
               <a
@@ -180,17 +222,17 @@ export default function Contact() {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                LinkedIn ↗
+                LinkedIn
+                <span>↗</span>
               </a>
 
             </div>
 
           </div>
 
-
-          {/* ====================================
+          {/* =================================================
               FORM
-          ==================================== */}
+              ================================================= */}
 
           <form
             className="contact__form"
@@ -198,10 +240,12 @@ export default function Contact() {
             noValidate
           >
 
+            {/* NAME */}
+
             <div className="form__group">
 
               <label htmlFor="name">
-                Name
+                01. Name
               </label>
 
               <input
@@ -217,11 +261,12 @@ export default function Contact() {
 
             </div>
 
+            {/* EMAIL */}
 
             <div className="form__group">
 
               <label htmlFor="email">
-                Email
+                02. Email
               </label>
 
               <input
@@ -237,13 +282,14 @@ export default function Contact() {
 
             </div>
 
+            {/* PROJECT + BUDGET */}
 
             <div className="form__row">
 
               <div className="form__group">
 
                 <label htmlFor="projectType">
-                  Project Type
+                  03. Project Type
                 </label>
 
                 <select
@@ -253,6 +299,7 @@ export default function Contact() {
                   onChange={handleChange}
                   disabled={loading}
                 >
+
                   <option value="">
                     Select
                   </option>
@@ -276,15 +323,15 @@ export default function Contact() {
                   <option value="other">
                     Other
                   </option>
+
                 </select>
 
               </div>
 
-
               <div className="form__group">
 
                 <label htmlFor="budget">
-                  Budget
+                  04. Budget
                 </label>
 
                 <select
@@ -294,6 +341,7 @@ export default function Contact() {
                   onChange={handleChange}
                   disabled={loading}
                 >
+
                   <option value="">
                     Select
                   </option>
@@ -317,17 +365,19 @@ export default function Contact() {
                   <option value="discuss">
                     Let's discuss
                   </option>
+
                 </select>
 
               </div>
 
             </div>
 
+            {/* MESSAGE */}
 
             <div className="form__group">
 
               <label htmlFor="message">
-                Tell me about your project
+                05. Tell me about your project
               </label>
 
               <textarea
@@ -342,8 +392,9 @@ export default function Contact() {
 
             </div>
 
-
-            {/* FEEDBACK */}
+            {/* =================================================
+                FEEDBACK
+                ================================================= */}
 
             {error && (
               <div
@@ -363,24 +414,32 @@ export default function Contact() {
               </div>
             )}
 
+            {/* =================================================
+                SUBMIT
+                ================================================= */}
 
             <button
               type="submit"
               className="contact__submit"
               disabled={loading}
             >
-              {loading
-                ? "Sending..."
-                : "Send Enquiry"}
+              <span>
+                {loading
+                  ? "Sending..."
+                  : "Send Enquiry"}
+              </span>
 
               {!loading && (
-                <span>→</span>
+                <span aria-hidden="true">
+                  ↗
+                </span>
               )}
             </button>
 
           </form>
 
         </div>
+
       </div>
     </section>
   );

@@ -4,12 +4,11 @@ import { useState } from "react";
 import "../styles/Navbar.css";
 
 const navItems = [
-  { label: "About", href: "#about" },
-  { label: "Services", href: "#services" },
-  { label: "Skills", href: "#skills" },
-  { label: "Work", href: "#work" },
-  { label: "Reviews", href: "#reviews" },
-  { label: "Contact", href: "#contact" },
+  { number: "01", label: "home", href: "#top" },
+  { number: "02", label: "expertise", href: "#services" },
+  { number: "03", label: "work", href: "#work" },
+  { number: "04", label: "testimonials", href: "#reviews" },
+  { number: "05", label: "contact", href: "#contact" },
 ];
 
 export default function Navbar() {
@@ -21,20 +20,21 @@ export default function Navbar() {
 
   return (
     <header className="navbar">
-      <div className="container navbar__container">
+      <div className="navbar__container">
         <a
           href="#top"
           className="navbar__logo"
           onClick={handleNavigation}
+          aria-label="Avinash Vishwakarma home"
         >
-          AV
+          <span>Avinash</span>
+          <strong>.</strong>
+          <i>_</i>
         </a>
 
         <nav
           className={`navbar__links ${
-            menuOpen
-              ? "navbar__links--open"
-              : ""
+            menuOpen ? "navbar__links--open" : ""
           }`}
         >
           {navItems.map((item) => (
@@ -43,37 +43,26 @@ export default function Navbar() {
               href={item.href}
               onClick={handleNavigation}
             >
-              {item.label}
+              <small>{item.number}</small>
+
+              <span>
+                <b>//</b> {item.label}
+              </span>
             </a>
           ))}
-
-          <a
-            href="#contact"
-            className="navbar__cta"
-            onClick={handleNavigation}
-          >
-            Hire Me
-          </a>
         </nav>
 
         <button
           type="button"
           className={`navbar__toggle ${
-            menuOpen
-              ? "navbar__toggle--open"
-              : ""
+            menuOpen ? "navbar__toggle--open" : ""
           }`}
-          onClick={() =>
-            setMenuOpen((current) => !current)
-          }
+          onClick={() => setMenuOpen((current) => !current)}
           aria-label={
-            menuOpen
-              ? "Close navigation"
-              : "Open navigation"
+            menuOpen ? "Close navigation" : "Open navigation"
           }
           aria-expanded={menuOpen}
         >
-          <span />
           <span />
           <span />
         </button>

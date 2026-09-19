@@ -1,66 +1,42 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import "../styles/Stats.css";
-import { getStats } from "../lib/api";
 
-export default function Stats() {
-  const [stats, setStats] = useState(null);
-
-  useEffect(() => {
-    let mounted = true;
-
-    async function loadStats() {
-      try {
-        const response = await getStats();
-
-        if (mounted) {
-          setStats(response?.data || {});
-        }
-      } catch (error) {
-        console.error(
-          "Failed to load stats:",
-          error
-        );
-      }
-    }
-
-    loadStats();
-
-    return () => {
-      mounted = false;
-    };
-  }, []);
-
+export default function Stats({ stats }) {
   const averageRating =
     stats?.averageRating !== null &&
     stats?.averageRating !== undefined
-      ? `${Number(stats.averageRating).toFixed(1)}/5`
-      : "0.0/5";
+      ? Number(stats.averageRating).toFixed(1)
+      : "0.0";
 
   const items = [
     {
+      number: "01",
       value: stats?.totalProjects ?? 0,
       label: "Projects",
-      description: "Built & delivered",
+      description: "Total projects",
     },
     {
+      number: "02",
       value: stats?.completedProjects ?? 0,
       label: "Completed",
-      description: "Successfully finished",
+      description: "Successfully delivered",
     },
     {
+      number: "03",
       value: stats?.activeProjects ?? 0,
       label: "Active",
       description: "Currently in progress",
     },
     {
+      number: "04",
       value: stats?.totalReviews ?? 0,
       label: "Reviews",
       description: "Client feedback",
     },
     {
-      value: averageRating,
+      number: "05",
+      value: `${averageRating}/5`,
       label: "Rating",
       description: "Average client rating",
     },
@@ -69,44 +45,67 @@ export default function Stats() {
   return (
     <section
       className="stats"
-      aria-label="Professional statistics"
+      aria-labelledby="stats-title"
     >
       <div className="container">
+
+        {/* =================================================
+            HEADER
+            ================================================= */}
+
         <div className="stats__header">
-          <p className="eyebrow">
-            06. Track Record
-          </p>
+
+          <div>
+            <p className="eyebrow">
+              06. Track Record
+            </p>
+
+            <h2
+              id="stats-title"
+              className="section-title"
+            >
+              By the{" "}
+              <span>numbers.</span>
+            </h2>
+          </div>
 
           <p className="stats__intro">
-            A quick look at the work,
-            projects, and feedback behind
-            my experience.
+            A simple look at the projects,
+            client feedback and work currently
+            represented in my portfolio.
           </p>
+
         </div>
 
+        {/* =================================================
+            STATISTICS
+            ================================================= */}
+
         <div className="stats__grid">
-          {items.map((item, index) => (
+
+          {items.map((item) => (
             <article
               className="stat"
-              key={item.label}
+              key={item.number}
             >
+
               <div className="stat__top">
+
                 <span className="stat__number">
-                  {String(index + 1).padStart(
-                    2,
-                    "0"
-                  )}
+                  {item.number}
                 </span>
 
                 <span
-                  className="stat__mark"
+                  className="stat__symbol"
                   aria-hidden="true"
                 >
                   +
                 </span>
+
               </div>
 
               <div className="stat__content">
+
                 <strong className="stat__value">
                   {item.value}
                 </strong>
@@ -118,10 +117,14 @@ export default function Stats() {
                 <p className="stat__description">
                   {item.description}
                 </p>
+
               </div>
+
             </article>
           ))}
+
         </div>
+
       </div>
     </section>
   );

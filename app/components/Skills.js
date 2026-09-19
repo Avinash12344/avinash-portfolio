@@ -1,51 +1,48 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import "../styles/Skills.css";
-import { getSkills } from "../lib/api";
 
-export default function Skills() {
-  const [skills, setSkills] = useState([]);
-  const [loading, setLoading] = useState(true);
+const fallbackSkills = [
+  {
+    id: "fallback-1",
+    name: "JavaScript",
+    category: "Frontend / Backend",
+    proficiency: 85,
+  },
+  {
+    id: "fallback-2",
+    name: "React",
+    category: "Frontend",
+    proficiency: 85,
+  },
+  {
+    id: "fallback-3",
+    name: "Node.js",
+    category: "Backend",
+    proficiency: 80,
+  },
+  {
+    id: "fallback-4",
+    name: "PostgreSQL",
+    category: "Database",
+    proficiency: 75,
+  },
+];
 
-  useEffect(() => {
-    let mounted = true;
-
-    async function loadSkills() {
-      try {
-        const response = await getSkills();
-
-        const data = Array.isArray(response?.data)
-          ? response.data
-          : [];
-
-        const activeSkills = data.filter(
+export default function Skills({ skills }) {
+  const activeSkills =
+    Array.isArray(skills)
+      ? skills.filter(
           (skill) =>
             skill &&
             skill.is_active !== false
-        );
+        )
+      : [];
 
-        if (mounted) {
-          setSkills(activeSkills);
-        }
-      } catch (error) {
-        console.error(
-          "Failed to load skills:",
-          error
-        );
-      } finally {
-        if (mounted) {
-          setLoading(false);
-        }
-      }
-    }
-
-    loadSkills();
-
-    return () => {
-      mounted = false;
-    };
-  }, []);
+  const skillList =
+    activeSkills.length > 0
+      ? activeSkills
+      : fallbackSkills;
 
   return (
     <section
@@ -54,13 +51,11 @@ export default function Skills() {
       aria-labelledby="skills-title"
     >
       <div className="container">
-
         <p className="eyebrow">
           03. Skills
         </p>
 
         <div className="skills__header">
-
           <h2
             id="skills-title"
             className="section-title"
@@ -74,88 +69,63 @@ export default function Skills() {
             reliable applications and solve real
             engineering problems.
           </p>
-
         </div>
 
-        {loading ? (
-          <div
-            className="skills__state"
-            role="status"
-            aria-live="polite"
-          >
-            Loading skills...
-          </div>
-        ) : skills.length === 0 ? (
-          <div className="skills__state">
-            No skills available.
-          </div>
-        ) : (
-          <div className="skills__grid">
+        <div className="skills__grid">
+          {skillList.map((skill, index) => {
+            const proficiency =
+              skill.proficiency !== null &&
+              skill.proficiency !== undefined
+                ? Math.min(
+                    Math.max(
+                      Number(skill.proficiency) || 0,
+                      0
+                    ),
+                    100
+                  )
+                : null;
 
-            {skills.map((skill) => {
-
-              const proficiency =
-                skill.proficiency !== null &&
-                skill.proficiency !== undefined
-                  ? Math.min(
-                      Math.max(
-                        Number(skill.proficiency) || 0,
-                        0
-                      ),
-                      100
-                    )
-                  : null;
-
-              return (
-                <article
-                  className="skill-card"
-                  key={skill.id}
-                >
-
-                  <div className="skill-card__top">
-
-                    <h3>
-                      {skill.name}
-                    </h3>
-
-                    {proficiency !== null && (
-                      <span>
-                        {proficiency}%
-                      </span>
-                    )}
-
-                  </div>
-
-                  {skill.category && (
-                    <p className="skill-card__category">
-                      {skill.category}
-                    </p>
-                  )}
+            return (
+              <article
+                className="skill-card"
+                key={skill.id || index}
+              >
+                <div className="skill-card__top">
+                  <h3>{skill.name}</h3>
 
                   {proficiency !== null && (
-                    <div
-                      className="skill-card__bar"
-                      role="progressbar"
-                      aria-valuenow={proficiency}
-                      aria-valuemin="0"
-                      aria-valuemax="100"
-                      aria-label={`${skill.name} proficiency`}
-                    >
-                      <span
-                        style={{
-                          width: `${proficiency}%`,
-                        }}
-                      />
-                    </div>
+                    <span>
+                      {proficiency}%
+                    </span>
                   )}
+                </div>
 
-                </article>
-              );
-            })}
+                {skill.category && (
+                  <p className="skill-card__category">
+                    {skill.category}
+                  </p>
+                )}
 
-          </div>
-        )}
-
+                {proficiency !== null && (
+                  <div
+                    className="skill-card__bar"
+                    role="progressbar"
+                    aria-valuenow={proficiency}
+                    aria-valuemin="0"
+                    aria-valuemax="100"
+                    aria-label={`${skill.name} proficiency`}
+                  >
+                    <span
+                      style={{
+                        width: `${proficiency}%`,
+                      }}
+                    />
+                  </div>
+                )}
+              </article>
+            );
+          })}
+        </div>
       </div>
     </section>
   );
